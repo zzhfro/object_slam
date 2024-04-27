@@ -19,7 +19,7 @@
 */
 
 #include "LoopClosing.h"
-
+#include<unistd.h>
 #include "Sim3Solver.h"
 
 #include "Converter.h"
