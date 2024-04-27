@@ -11,8 +11,8 @@ namespace ORB_SLAM2
         for(int i=0;i<dyanmicBoxes.size();++i)
         {
              
-           double left = dyanmicBoxes[i].x-dyanmicBoxes[i].x*0.5;
-           double right = dyanmicBoxes[i].x+dyanmicBoxes[i].x*0.5;
+           double left = dyanmicBoxes[i].x-dyanmicBoxes[i].w*0.5;
+           double right = dyanmicBoxes[i].x+dyanmicBoxes[i].w*0.5;
 
            double top = dyanmicBoxes[i].y-dyanmicBoxes[i].h*0.5;
            
@@ -39,8 +39,8 @@ bool DetectResult::iskeypoint_static(const cv::KeyPoint& kp,std::vector<DetectRe
         for(int i=0;i<staticBoxes.size();++i)
         {
              
-           double left = staticBoxes[i].x-staticBoxes[i].x*0.5;
-           double right = staticBoxes[i].x+staticBoxes[i].x*0.5;
+           double left = staticBoxes[i].x-staticBoxes[i].w*0.5;
+           double right = staticBoxes[i].x+staticBoxes[i].w*0.5;
 
            double top = staticBoxes[i].y-staticBoxes[i].h*0.5;
            

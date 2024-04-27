@@ -52,6 +52,14 @@ int main(int argc, char **argv)
     // load detection for the convenience of validation currently offline mode
     std::vector<ORB_SLAM2::DetectResult> DetectResults;
     LoadDetection(string(argv[5]),DetectResults);
+    for(int i=0;i<DetectResults.size();++i)
+    {
+        DetectResults[i].print_detect();
+        std::cout<<"######"<<std::endl;
+        std::cout<<DetectResults[i].StaticBoxes.size()<<std::endl;
+        std::cout<<DetectResults[i].DynamicBoxes.size()<<std::endl;
+        std::cout<<DetectResults[i].ObjectBoxes.size()<<std::endl;
+    }
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::RGBD,true);

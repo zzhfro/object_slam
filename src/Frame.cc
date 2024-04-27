@@ -22,6 +22,8 @@
 #include "Converter.h"
 #include "ORBmatcher.h"
 #include <thread>
+#include "ObjectDetect.h"
+
 
 namespace ORB_SLAM2
 {
@@ -136,10 +138,19 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
     ExtractORB(0,imGray);
 
     N = mvKeys.size();
-
+    
     if(mvKeys.empty())
         return;
-
+    
+    for(int i=0;i<N;++i)
+    {
+     cv::KeyPoint kp=mvKeys[i];
+     if(detect.iskeypoint_dynamic(kp,detect.DynamicBoxes)&&!detect.iskeypoint_static(kp,detect.StaticBoxes))
+     {
+        mvKeys[i] = cv::KeyPoint(-1,-1,-1);
+     }
+    }
+    
     UndistortKeyPoints();
 
     ComputeStereoFromRGBD(imDepth);
@@ -705,9 +716,12 @@ void Frame::ComputeStereoFromRGBD(const cv::Mat &imDepth)
 
         const float &v = kp.pt.y;
         const float &u = kp.pt.x;
-
+        if(v<0 || u<0)
+        {
+            continue;
+        }
         const float d = imDepth.at<float>(v,u);
-
+        
         if(d>0)
         {
             mvDepth[i] = d;
