@@ -39,7 +39,7 @@ namespace ORB_SLAM2
 
 class MapPoint;
 class KeyFrame;
-
+class DetectResult;
 class Frame
 {
 public:

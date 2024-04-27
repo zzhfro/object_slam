@@ -68,6 +68,7 @@ src/KeyFrameDatabase.cc
 src/Sim3Solver.cc
 src/Initializer.cc
 src/Viewer.cc
+src/ObjectDetect.cc
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -81,10 +82,6 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 # Build examples
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/RGB-D)
-
-add_executable(rgbd_tum
-Examples/RGB-D/rgbd_tum.cc)
-target_link_libraries(rgbd_tum ${PROJECT_NAME})
 
 add_executable(semantic_slam
 Examples/RGB-D/semantic_slam.cc)

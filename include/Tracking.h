@@ -37,7 +37,7 @@
 #include "Initializer.h"
 #include "MapDrawer.h"
 #include "System.h"
-
+#include "ObjectDetect.h"
 #include <mutex>
 
 namespace ORB_SLAM2
@@ -49,7 +49,7 @@ class Map;
 class LocalMapping;
 class LoopClosing;
 class System;
-
+class DetectResult;
 class Tracking
 {  
 
@@ -59,7 +59,7 @@ public:
 
     // Preprocess the input and call Track(). Extract features and performs stereo matching.
     cv::Mat GrabImageStereo(const cv::Mat &imRectLeft,const cv::Mat &imRectRight, const double &timestamp);
-    cv::Mat GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp);
+    cv::Mat GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp,DetectResult &detect);
     cv::Mat GrabImageMonocular(const cv::Mat &im, const double &timestamp);
 
     void SetLocalMapper(LocalMapping* pLocalMapper);
