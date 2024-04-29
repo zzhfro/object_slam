@@ -32,6 +32,7 @@
 
 #include"Optimizer.h"
 #include"PnPsolver.h"
+#include"utils.h"
 
 #include<iostream>
 
@@ -199,6 +200,8 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
     mCurrentFrame = Frame(mImGray,imGrayRight,timestamp,mpORBextractorLeft,mpORBextractorRight,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
     Track();
+    
+    
 
     return mCurrentFrame.mTcw.clone();
 }
@@ -231,6 +234,30 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 
     Track();
 
+
+    if (mState == Tracking::OK) 
+    //if track points successful then track the object
+    {
+       Eigen::Matrix<double,3,4> Rt = RtFromT(mCurrentFrame.mTcw);
+       double z_mean=0;
+       unsigned int z_nb = 0;
+            for(size_t i = 0; i < mCurrentFrame.mvpMapPoints.size(); i++) {
+                MapPoint* pMP = mCurrentFrame.mvpMapPoints[i];
+                if(pMP && !mCurrentFrame.mvbOutlier[i]) {
+                    cv::Mat mp =  pMP->GetWorldPos();
+                    Eigen::Vector4d p(mp.at<float>(0), mp.at<float>(1), mp.at<float>(2), 1.0);
+                    Eigen::Vector3d p_cam = Rt * p;
+                    z_mean += p_cam[2];
+                    z_nb++;
+                }
+            }
+        z_mean /= z_nb;
+        std::cout<<"mean DEPTH"<<std::endl;
+        std::cout<<z_mean<<std::endl;
+    }
+
+    
+
     return mCurrentFrame.mTcw.clone();
 }
 
@@ -260,7 +287,20 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
         mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
     Track();
-
+    
+    /**a pipeline 
+     * algorithm: (The algorithm is primarily proposed in oa-slam)
+     *  
+     * camera tracking->object tracking->object mapping
+     * 
+     * after object tracking ,we get the object status:new object or existing object
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+    */
     return mCurrentFrame.mTcw.clone();
 }
 
