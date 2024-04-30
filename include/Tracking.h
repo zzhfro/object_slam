@@ -39,10 +39,11 @@
 #include "System.h"
 #include "ObjectDetect.h"
 #include <mutex>
+#include "Object.h"
 
 namespace ORB_SLAM2
 {
-
+class Object;
 class Viewer;
 class FrameDrawer;
 class Map;
@@ -169,7 +170,7 @@ protected:
     KeyFrame* mpReferenceKF;
     std::vector<KeyFrame*> mvpLocalKeyFrames;
     std::vector<MapPoint*> mvpLocalMapPoints;
-    
+    std::vector<Object*> objects;
     // System
     System* mpSystem;
     
