@@ -24,7 +24,7 @@
 #include "MapPoint.h"
 #include "KeyFrame.h"
 #include <set>
-
+#include "Object.h"
 #include <mutex>
 
 
@@ -51,7 +51,7 @@ public:
     std::vector<KeyFrame*> GetAllKeyFrames();
     std::vector<MapPoint*> GetAllMapPoints();
     std::vector<MapPoint*> GetReferenceMapPoints();
-
+    
     long unsigned int MapPointsInMap();
     long unsigned  KeyFramesInMap();
 
@@ -60,7 +60,7 @@ public:
     void clear();
 
     vector<KeyFrame*> mvpKeyFrameOrigins;
-
+    std::vector<Object*> objects_map;
     std::mutex mMutexMapUpdate;
 
     // This avoid that two points are created simultaneously in separate threads (id conflict)
@@ -69,7 +69,7 @@ public:
 protected:
     std::set<MapPoint*> mspMapPoints;
     std::set<KeyFrame*> mspKeyFrames;
-
+   
     std::vector<MapPoint*> mvpReferenceMapPoints;
 
     long unsigned int mnMaxKFid;
