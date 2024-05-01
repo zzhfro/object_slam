@@ -254,7 +254,7 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
                 }
             }
         z_mean /= z_nb;
-    
+        
     
         BoundingBox img_box(imRGB.cols/2,imRGB.rows/2,imRGB.cols,imRGB.rows,-1,-1);
         int detect_num=detect.get_detect_num();
@@ -264,14 +264,6 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
           Eigen::Matrix3d k;
           cv::cv2eigen(mK, k);  
           Eigen::Matrix<double,3,4> project_matrix=k*Rt;
-          std::cout<<"MK"<<std::endl;
-          std::cout<<mCurrentFrame.mTcw<<std::endl;
-          std::cout<<"test projection matrix"<<std::endl;
-          std::cout<<Rt<<std::endl;
-          std::cout<<"Rt"<<std::endl;
-          std::cout<<k<<std::endl;
-          std::cout<<"P"<<std::endl;
-          std::cout<<project_matrix<<std::endl;
           std::unordered_map<Object*, BoundingBox> proj_boxes;
 
         }
