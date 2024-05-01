@@ -7,23 +7,14 @@
 
 #include"FrameDrawer.h"
 #include <mutex>
-
+#include "BoundingBox.h" 
 namespace ORB_SLAM2
 {
+class BoundingBox;  
 class DetectResult
 {
 public:
-   struct BoundingBox
-   {
-     double x,y,w,h;  //the central and the width and higth
-     int ObjectCategory;
-     double ObjectConf;
-     
-     BoundingBox(double _x, double _y, double _w, double _h, int _ObjectCategory,double _ObjectConf)
-        : x(_x), y(_y), w(_w), h(_h),  ObjectCategory(_ObjectCategory),ObjectConf(_ObjectConf)
-    {
-    }
-   };
+  
    string image_num; //in fact it is not necessary but i use it for check 
    int NumObject;
    //std::vector<int> ObjectCategory;

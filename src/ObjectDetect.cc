@@ -2,7 +2,7 @@
 
 namespace ORB_SLAM2
 {
- bool DetectResult::iskeypoint_dynamic(const cv::KeyPoint& kp,std::vector<DetectResult::BoundingBox> &dyanmicBoxes) 
+ bool DetectResult::iskeypoint_dynamic(const cv::KeyPoint& kp,std::vector<BoundingBox> &dyanmicBoxes) 
  {
         
         float kp_u  = kp.pt.x;
@@ -31,7 +31,7 @@ namespace ORB_SLAM2
 }
 
 // 判断特征点是否在静态检测框内
-bool DetectResult::iskeypoint_static(const cv::KeyPoint& kp,std::vector<DetectResult::BoundingBox> &staticBoxes) 
+bool DetectResult::iskeypoint_static(const cv::KeyPoint& kp,std::vector<BoundingBox> &staticBoxes) 
 {
         float kp_u  = kp.pt.x;
         float kp_v = kp.pt.y;

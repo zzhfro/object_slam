@@ -70,6 +70,7 @@ src/Sim3Solver.cc
 src/Initializer.cc
 src/Viewer.cc
 src/ObjectDetect.cc
+src/Ellipse.cc
 )
 
 target_link_libraries(${PROJECT_NAME}
