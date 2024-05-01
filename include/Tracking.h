@@ -170,7 +170,7 @@ protected:
     KeyFrame* mpReferenceKF;
     std::vector<KeyFrame*> mvpLocalKeyFrames;
     std::vector<MapPoint*> mvpLocalMapPoints;
-    std::vector<Object*> objects;
+    std::vector<Object*> objects_track;
     // System
     System* mpSystem;
     

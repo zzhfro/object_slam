@@ -4,7 +4,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <opencv2/core.hpp>
-
+#include <opencv2/core/eigen.hpp>
 namespace ORB_SLAM2{
 
  /**
@@ -14,27 +14,19 @@ namespace ORB_SLAM2{
  */
  Eigen::Matrix<double, 3, 4> RtFromT(const cv::Mat& cvMat) 
   {
-    Eigen::Matrix<double, 3, 4> eigenMat;
-
-    // 提取旋转部分
+    Eigen::MatrixXd eigenTcw;
+    cv::cv2eigen(cvMat, eigenTcw);
     Eigen::Matrix3d R;
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            R(i, j) = cvMat.at<double>(i, j);
-        }
-    }
-
-    // 提取平移部分
     Eigen::Vector3d t;
-    for (int i = 0; i < 3; ++i) {
-        t(i) = cvMat.at<double>(i, 3);
-    }
+    // 提取旋转矩阵R（前3列）
+    R = eigenTcw.block<3, 3>(0, 0).cast<double>();
 
-    // 将旋转部分和平移部分组合成一个 3x4 的矩阵 [R, t]
-    eigenMat.block<3, 3>(0, 0) = R;
-    eigenMat.block<3, 1>(0, 3) = t;
-
-    return eigenMat;
+    // 提取平移向量t（第4列）
+    t = eigenTcw.block<3, 1>(0, 3).cast<double>();
+   
+    Eigen::MatrixXd Rt(3, 4);
+    Rt << R, t;
+    return Rt;
    }
 }
 #endif

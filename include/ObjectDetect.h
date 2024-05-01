@@ -25,6 +25,10 @@ public:
    std::vector<BoundingBox> DynamicBoxes;
    
    // return 1 if dynamic return 0 if static
+   int get_detect_num()
+   {
+    return NumObject;
+   }
    inline bool if_dynamic(const std::vector<int> &dynamic_category, int object_catrgory) 
    {
      return std::find(dynamic_category.begin(), dynamic_category.end(), object_catrgory) != dynamic_category.end();
