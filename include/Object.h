@@ -10,7 +10,7 @@ public:
    {
     
    }
-
+   
    Ellipsoid ellipsoid;
    int category_id;
    int object_id;

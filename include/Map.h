@@ -59,6 +59,8 @@ public:
 
     void clear();
 
+    vector<Object*> GetAllObjects();
+
     vector<KeyFrame*> mvpKeyFrameOrigins;
     std::vector<Object*> objects_map;
     std::mutex mMutexMapUpdate;

@@ -19,7 +19,7 @@
 */
 
 #include "Map.h"
-
+#include "Object.h"
 #include<mutex>
 
 namespace ORB_SLAM2
@@ -90,7 +90,11 @@ vector<MapPoint*> Map::GetAllMapPoints()
     unique_lock<mutex> lock(mMutexMap);
     return vector<MapPoint*>(mspMapPoints.begin(),mspMapPoints.end());
 }
-
+vector<Object*> Map::GetAllObjects()
+{
+    unique_lock<mutex> lock(mMutexMap);
+    return objects_map;
+}
 long unsigned int Map::MapPointsInMap()
 {
     unique_lock<mutex> lock(mMutexMap);
