@@ -7,6 +7,7 @@ namespace ORB_SLAM2
 {
   class  Ellipse
   { 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     public:
         Ellipse()
         {

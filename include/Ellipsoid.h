@@ -7,6 +7,7 @@ namespace ORB_SLAM2
 {
   class  Ellipsoid
   {
+   EIGEN_MAKE_ALIGNED_OPERATOR_NEW; 
    public: 
     
 
@@ -28,9 +29,9 @@ namespace ORB_SLAM2
            
     public:
         Eigen::Matrix4d Q;
-        Eigen::Vector3d axes;
-        Eigen::Matrix3d R;
-        Eigen::Vector3d center;
+        Eigen::Vector3d axes=Eigen::Vector3d(-1,-1,-1);
+        Eigen::Matrix3d R=Eigen::Matrix3d::Identity();
+        Eigen::Vector3d center=Eigen::Vector3d(-1,-1,-1);
        
 
 
