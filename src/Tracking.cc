@@ -29,7 +29,7 @@
 #include"Converter.h"
 #include"Map.h"
 #include"Initializer.h"
-
+#include"BoundingBox.h"
 #include"Optimizer.h"
 #include"PnPsolver.h"
 #include"Utils.h"
@@ -253,17 +253,8 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
             }
         z_mean /= z_nb;
     }
-    Object test_object;
-    Eigen::Vector3d axes(0.5,0.2,0.1);
-
-    Eigen::Matrix3d R=Eigen::Matrix3d::Identity();
-
-    Eigen::Vector3d center(1,2,2);
-    Ellipsoid test_ellipsoid(axes,R,center);
-
-    test_object.ellipsoid=test_ellipsoid;
-    test_object.insert_Map(mpMap);
     
+    BoundingBox img_box(imRGB.cols/2,imRGB.rows/2,imRGB.cols,imRGB.rows,-1,-1);
     
 
     return mCurrentFrame.mTcw.clone();

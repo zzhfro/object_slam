@@ -7,6 +7,10 @@ initial 3D object reconstruction
 
 
 
+to do :
+给静态数据集更新下检测结果
 
-1 why we use ellipse
+
+track 函数写完
+
 
