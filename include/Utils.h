@@ -1,5 +1,6 @@
 #ifndef UTILES_H
 #define UTILES_H
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <opencv2/core.hpp>
@@ -11,7 +12,8 @@ namespace ORB_SLAM2{
   * From T to [R,t]
   * 
  */
- Eigen::Matrix<double, 3, 4> RtFromT(const cv::Mat& cvMat) {
+ Eigen::Matrix<double, 3, 4> RtFromT(const cv::Mat& cvMat) 
+  {
     Eigen::Matrix<double, 3, 4> eigenMat;
 
     // 提取旋转部分

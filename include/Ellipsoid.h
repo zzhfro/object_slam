@@ -18,7 +18,7 @@ namespace ORB_SLAM2
     }
     Ellipsoid(const Eigen::Matrix4d& Q_) {
         if ((Q_.transpose() - Q_).cwiseAbs().sum() > 1e-3) {
-            std::cerr << "Warning: Matrix should be symmetric" << "\n";
+            std::cout << "Warning: Matrix should be symmetric" << "\n";
         }
         Q = Q_;
         Q /= -Q(3, 3);
@@ -44,6 +44,10 @@ namespace ORB_SLAM2
    {
     return center;
    }
+   Eigen::Matrix<double, Eigen::Dynamic, 3> generate_ellipsoid_points(int azimuths, int elevations, int sampling);
+   Eigen::Matrix<double, Eigen::Dynamic, 3> generate_point_cloud(int sampling);
+
+
 
     public:
         Eigen::Matrix4d Q;
