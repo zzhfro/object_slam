@@ -23,7 +23,7 @@
 #include "KeyFrame.h"
 #include <pangolin/pangolin.h>
 #include <mutex>
-
+#include "Object.h"
 namespace ORB_SLAM2
 {
 
@@ -78,6 +78,11 @@ void MapDrawer::DrawMapPoints()
     }
 
     glEnd();
+}
+void MapDrawer::DrawMapObjects()
+{
+  const std::vector<Object*>objects=mpMap->GetAllObjects();
+  
 }
 
 void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
