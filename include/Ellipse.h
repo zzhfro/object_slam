@@ -29,7 +29,7 @@ namespace ORB_SLAM2
 
    
            
-    private:
+    public:
         Eigen::Matrix3d C; //primal
         double angle=0; 
         Eigen::Vector2d axes=Eigen::Vector2d(-1, -1);

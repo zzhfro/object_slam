@@ -68,6 +68,8 @@
   "unordered_set": "cpp",
   "future": "cpp",
   "cfenv": "cpp",
-  "valarray": "cpp"
+  "valarray": "cpp",
+  "core": "cpp",
+  "specialfunctions": "cpp"
  }
 }
