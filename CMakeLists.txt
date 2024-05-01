@@ -72,6 +72,7 @@ src/Viewer.cc
 src/ObjectDetect.cc
 src/Ellipse.cc
 src/Ellipsoid.cc
+src/Object.cc
 )
 
 target_link_libraries(${PROJECT_NAME}

@@ -45,7 +45,7 @@ public:
     void SetCurrentCameraPose(const cv::Mat &Tcw);
     void SetReferenceKeyFrame(KeyFrame *pKF);
     void GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M);
-
+    bool display_3d_bbox_=0;
 private:
 
     float mKeyFrameSize;
