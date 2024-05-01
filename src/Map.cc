@@ -42,7 +42,13 @@ void Map::AddMapPoint(MapPoint *pMP)
     unique_lock<mutex> lock(mMutexMap);
     mspMapPoints.insert(pMP);
 }
-
+/*
+void Map::AddMapObject(Object *obj)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    objects_map.push_back(obj);
+}
+*/
 void Map::EraseMapPoint(MapPoint *pMP)
 {
     unique_lock<mutex> lock(mMutexMap);

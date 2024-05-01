@@ -252,10 +252,15 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
                 }
             }
         z_mean /= z_nb;
-        std::cout<<"mean DEPTH"<<std::endl;
-        std::cout<<z_mean<<std::endl;
     }
+    Object test_object;
+    Eigen::Vector3d axes(50,20,10);
 
+    Eigen::Matrix3d R=Eigen::Matrix3d::Identity();
+
+    Eigen::Vector3d center(10,20,20);
+    Ellipsoid test_ellipsoid(axes,R,center);
+    
     
 
     return mCurrentFrame.mTcw.clone();

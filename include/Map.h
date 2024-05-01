@@ -34,6 +34,7 @@ namespace ORB_SLAM2
 
 class MapPoint;
 class KeyFrame;
+class Object;
 
 class Map
 {
@@ -58,7 +59,7 @@ public:
     long unsigned int GetMaxKFid();
 
     void clear();
-
+    //void AddMapObject(Object *obj);
     vector<Object*> GetAllObjects();
 
     vector<KeyFrame*> mvpKeyFrameOrigins;
@@ -73,7 +74,7 @@ protected:
     std::set<KeyFrame*> mspKeyFrames;
    
     std::vector<MapPoint*> mvpReferenceMapPoints;
-
+    
     long unsigned int mnMaxKFid;
 
     // Index related to a big change in the map (loop closure, global BA)
