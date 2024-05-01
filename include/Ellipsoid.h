@@ -26,6 +26,14 @@ namespace ORB_SLAM2
     }
     Ellipsoid(const Eigen::Vector3d& axes,const Eigen::Matrix3d& R,const Eigen::Vector3d& center);
      
+    void operator= (const Ellipsoid& ell) {
+        Q= ell.Q;
+
+        axes = ell.axes;
+        R = ell.R;
+        center = ell.center;
+    }
+     
     Eigen::Matrix4d get_Q()
     {
       return Q;

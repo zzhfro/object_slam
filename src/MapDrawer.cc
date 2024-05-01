@@ -24,6 +24,7 @@
 #include <pangolin/pangolin.h>
 #include <mutex>
 #include "Object.h"
+#include "Ellipsoid.h"
 namespace ORB_SLAM2
 {
 
@@ -81,8 +82,30 @@ void MapDrawer::DrawMapPoints()
 }
 void MapDrawer::DrawMapObjects()
 {
-  const std::vector<Object*>objects=mpMap->GetAllObjects();
-  
+   std::vector<Object*>objects=mpMap->GetAllObjects();
+  for(int i=0;i<objects.size();++i)
+  { 
+     glColor3f(static_cast<double>(objects[i]->color[2]) / 255,
+                  static_cast<double>(objects[i]->color[1]) / 255,
+                  static_cast<double>(objects[i]->color[0]) / 255);
+
+     Ellipsoid &ell=objects[i]->ellipsoid;
+     auto pts = ell.generate_point_cloud(50);
+     for(int i=0;i<pts.rows();++i)
+     {
+        glBegin(GL_LINE_STRIP);
+                // glColor3f(0.0, 1.0, 0.0);
+                // glBegin(GL_POINTS);
+                for (int k = 0; k < 50; ++k, ++i)
+                {
+                    glVertex3f(pts(i, 0), pts(i, 1), pts(i, 2));
+                }
+                glEnd();
+     }
+     
+
+    
+  }
 }
 
 void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
