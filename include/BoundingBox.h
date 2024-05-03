@@ -1,6 +1,6 @@
  #ifndef BOUNDING_BOX_H
  #define BOUNDING_BOX_H
- 
+ #include <iostream>
  namespace ORB_SLAM2{
  class BoundingBox
    {

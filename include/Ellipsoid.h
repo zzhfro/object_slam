@@ -3,6 +3,7 @@
 
 #include <Eigen/Dense>
 #include <iostream>
+#include "Ellipse.h"
 namespace ORB_SLAM2
 {
   class  Ellipsoid
@@ -20,6 +21,7 @@ namespace ORB_SLAM2
         if ((Q_.transpose() - Q_).cwiseAbs().sum() > 1e-3) {
             std::cout << "Warning: Matrix should be symmetric" << "\n";
         }
+        //in fact this function isn't completion but it doesn't effect the use
         Q = Q_;
         Q /= -Q(3, 3);
         
@@ -54,7 +56,13 @@ namespace ORB_SLAM2
    }
    Eigen::Matrix<double, Eigen::Dynamic, 3> generate_ellipsoid_points(int azimuths, int elevations, int sampling);
    Eigen::Matrix<double, Eigen::Dynamic, 3> generate_point_cloud(int sampling);
-
+   
+   Ellipse project(const Eigen::Matrix<double, 3, 4>& P)
+   {
+    Eigen::Matrix3d C_star=P*Q*P.transpose();
+    Eigen::Matrix3d C=C_star.inverse();
+    return Ellipse(C);
+   }
 
 
     public:

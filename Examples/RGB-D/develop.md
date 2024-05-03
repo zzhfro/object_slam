@@ -8,9 +8,6 @@ initial 3D object reconstruction
 
 
 to do :
-给静态数据集更新下检测结果
 
-
-track 函数写完
-
+椭圆投影测试 和box 测试
 

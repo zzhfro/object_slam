@@ -23,5 +23,46 @@ Ellipse::Ellipse(const Eigen::Vector2d& axes,double angle, const Eigen::Vector2d
           this->center = center;  
          
          }
+Ellipse::Ellipse(const Eigen::Matrix3d& C_) 
+         {
+            if ((C.transpose() - C).cwiseAbs().sum() > 1e-3) 
+            {
+                std::cout << "Warning: Matrix should be symmetric" << "\n";
+            }
+            C= C;
+            C/= -C(2, 2);
+            Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigensolver(C);
+            if (eigensolver.info() != Eigen::Success) {
+                std::cerr << "Eigen decomposition failed!" << std::endl;
+                return;
+            }
+
+            // 获取特征值和特征向量
+            Eigen::VectorXd eigenvalues = eigensolver.eigenvalues();
+            Eigen::MatrixXd eigenvectors = eigensolver.eigenvectors();
+
+            // 椭圆的中心位置
+            center = -eigenvectors.col(2).head(2);
+
+            // 椭圆的轴长
+            axes = eigenvalues.head(2).array().sqrt();
+
+            // 计算角度
+            angle = atan2(eigenvectors(1, 0), eigenvectors(0, 0));
+
+        
+         }
+BoundingBox Ellipse::ComputeBbox() 
+{
+         
+        double c = std::cos(angle);
+        double s = std::sin(angle);
+        double xmax = std::sqrt(std::pow(axes[0]*c, 2) + std::pow(-axes[1]*s, 2));
+        double ymax = std::sqrt(std::pow(axes[0]*s, 2) + std::pow( axes[1]*c, 2));
+
+         
+        BoundingBox box(center[0],center[1],xmax*2,ymax*2,-1,-1);
+        return box;
+}         
 
 };

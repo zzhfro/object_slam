@@ -271,9 +271,12 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
              if(tr->get_status()==ObjectTrackStatus::INITIALIZED||
                 tr->get_status()==ObjectTrackStatus::IN_MAP)    //only project the objects which have been intialized
                 {
-                  //remove the hidding boxes
-                //to do
+                  Eigen::Vector3d c=tr->get_ellipsoid().get_center();
+                  double z=Rt.row(2).dot(c.homogeneous());
+
+
                 }
+                
           }
 
          
