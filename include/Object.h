@@ -32,7 +32,16 @@ public:
    }
    
    void insert_Map(Map *pmap);
-   
+
+   ObjectTrackStatus get_status()
+   {
+    return status;
+   }
+   Ellipsoid get_ellipsoid()
+   {
+    return ellipsoid;
+   }
+
    Ellipsoid ellipsoid;
    int category_id;
    int object_id;

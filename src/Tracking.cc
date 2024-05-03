@@ -265,9 +265,31 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
           cv::cv2eigen(mK, k);  
           Eigen::Matrix<double,3,4> project_matrix=k*Rt;
           std::unordered_map<Object*, BoundingBox> proj_boxes;
+          
+          for(auto tr:objects_track)
+          {
+             if(tr->get_status()==ObjectTrackStatus::INITIALIZED||
+                tr->get_status()==ObjectTrackStatus::IN_MAP)    //only project the objects which have been intialized
+                {
+                  //remove the hidding boxes
+                //to do
+                }
+          }
 
+         
+
+
+        
+        
+        
         }
+    
+    
+    
     }
+
+
+
 
     return mCurrentFrame.mTcw.clone();
 }
