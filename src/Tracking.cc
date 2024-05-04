@@ -283,10 +283,10 @@ if (mState == Tracking::OK)
                     {
                         continue;
                     }
-                    //proj_boxes[tr]=box_project;
+                    
 
-                
-                    /*
+                    proj_boxes.insert(std::make_pair(tr, box_project));
+                    
                     //check occlsuions 
                     std::unordered_set<Object*> hidden;
                     for(auto it:proj_boxes)
@@ -310,11 +310,11 @@ if (mState == Tracking::OK)
                     {
                         proj_boxes.erase(hid);
                     }
-                    */
+                    
                }
                 
           }
-          /*
+          
           //find all the possible tricks which may be observed in this frame
           std::vector<Object*> possible_tracks;
           for(auto tr:objects_track)
@@ -334,7 +334,25 @@ if (mState == Tracking::OK)
         
             
           }
-          */
+          std::vector<std::unordered_set<MapPoint*>> assoc_map_points(detect_num);
+          for(int i=0;i<detect_num;++i)
+          {
+            for(int j=0;j<mCurrentFrame.mvKeysUn.size();++j)
+            {
+               if (mCurrentFrame.mvpMapPoints[j]) 
+               {
+                    const cv::KeyPoint kp=mCurrentFrame.mvKeysUn[j];
+                    MapPoint* corresp_map_point = mCurrentFrame.mvpMapPoints[j];
+                    if(detect.ObjectBoxes[i].if_keypoint_inbox(kp))
+                    {
+                        assoc_map_points[i].insert(corresp_map_point);
+                    }
+
+               }
+            }
+          }
+
+          
 
 
           

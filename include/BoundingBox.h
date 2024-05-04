@@ -1,6 +1,8 @@
  #ifndef BOUNDING_BOX_H
  #define BOUNDING_BOX_H
  #include <iostream>
+ #include<opencv2/core/core.hpp>
+#include<opencv2/features2d/features2d.hpp>
  namespace ORB_SLAM2{
  class BoundingBox
    {
@@ -13,7 +15,7 @@
            : x(_x), y(_y), w(_w), h(_h),  ObjectCategory(_ObjectCategory),ObjectConf(_ObjectConf)
        {
        }
-
+      
        double area()
        {
         return w*h;
@@ -48,6 +50,16 @@
           return std::max(0.0, intersection_x_max - intersection_x_min) *
                 std::max(0.0, intersection_y_max - intersection_y_min);
        }
+
+       bool if_keypoint_inbox(cv::KeyPoint kp) const {
+        double x=kp.pt.x;
+        double y=kp.pt.y;
+        double minX = x - w / 2.0;
+        double maxX = x + w / 2.0;
+        double minY = y - h / 2.0;
+        double maxY = y + h / 2.0;
+        return (x >= minX && x <= maxX && y >= minY && y <= maxY);
+    }
    };
 
  }
