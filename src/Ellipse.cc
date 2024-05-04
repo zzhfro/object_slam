@@ -66,7 +66,7 @@ Ellipse::Ellipse(const Eigen::Matrix3d& C_)
 
         
          }
-BoundingBox Ellipse::ComputeBbox() 
+BoundingBox Ellipse::compute_box() 
 {
          
         double c = std::cos(angle);
@@ -75,7 +75,7 @@ BoundingBox Ellipse::ComputeBbox()
         double ymax = std::sqrt(std::pow(axes[0]*s, 2) + std::pow( axes[1]*c, 2));
 
          
-        BoundingBox box(center[0],center[1],xmax*2,ymax*2,-1,-1);
+        BoundingBox box(center[0],center[1],xmax*2,ymax*2,-1,-1.0);
         return box;
 }         
 

@@ -17,7 +17,7 @@ namespace ORB_SLAM2
         
         Ellipse(const Eigen::Matrix3d& C_) ;
         
-        BoundingBox ComputeBbox();
+        BoundingBox compute_box();
         
         Ellipse(const Eigen::Vector2d& axes,double angle, const Eigen::Vector2d& center);
 

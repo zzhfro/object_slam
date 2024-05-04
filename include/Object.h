@@ -46,6 +46,8 @@ public:
    int category_id;
    int object_id;
    cv::Scalar color; //color is bounding to the category_id
+   std::vector<BoundingBox> box_observed; //store the box observe the object
+   std::vector<int> frame_id; //the correspondingframe
    //std::unordered_map<MapPoint*, int> associated_map_points_;
    ObjectTrackStatus status = ObjectTrackStatus::ONLY_2D;
 

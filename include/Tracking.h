@@ -93,6 +93,8 @@ public:
     // Input sensor
     int mSensor;
 
+    unsigned long current_frame_id;
+
     // Current Frame
     Frame mCurrentFrame;
     cv::Mat mImGray;

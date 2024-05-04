@@ -38,6 +38,7 @@
 
 #include<mutex>
 #include <opencv2/core/eigen.hpp>
+#include <unordered_set>
 
 
 
@@ -133,7 +134,8 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
     cout << "- Scale Factor: " << fScaleFactor << endl;
     cout << "- Initial Fast Threshold: " << fIniThFAST << endl;
     cout << "- Minimum Fast Threshold: " << fMinThFAST << endl;
-
+    
+    current_frame_id=0;
     if(sensor==System::STEREO || sensor==System::RGBD)
     {
         mThDepth = mbf*(float)fSettings["ThDepth"]/fx;
@@ -210,7 +212,8 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
 
 
 cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp,DetectResult &detect)
-{
+{   
+    current_frame_id=current_frame_id+1;
     mImGray = imRGB;
     cv::Mat imDepth = imD;
 
@@ -237,9 +240,9 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
     Track();
 
 
-    if (mState == Tracking::OK) 
-    //if track points successful then track the object
-    {
+if (mState == Tracking::OK) 
+//if track points successful then track the object
+{
        Eigen::Matrix<double,3,4> Rt = RtFromT(mCurrentFrame.mTcw);
        double z_mean=0;
        unsigned int z_nb = 0;
@@ -259,8 +262,8 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
         BoundingBox img_box(imRGB.cols/2,imRGB.rows/2,imRGB.cols,imRGB.rows,-1,-1);
         int detect_num=detect.get_detect_num();
     
-        if(detect_num!=0)
-        {
+    if(detect_num!=0)
+    {
           Eigen::Matrix3d k;
           cv::cv2eigen(mK, k);  
           Eigen::Matrix<double,3,4> project_matrix=k*Rt;
@@ -271,13 +274,69 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
              if(tr->get_status()==ObjectTrackStatus::INITIALIZED||
                 tr->get_status()==ObjectTrackStatus::IN_MAP)    //only project the objects which have been intialized
                 {
-                  Eigen::Vector3d c=tr->get_ellipsoid().get_center();
-                  double z=Rt.row(2).dot(c.homogeneous());
+                    Eigen::Vector3d c=tr->get_ellipsoid().get_center();
+                    double z=Rt.row(2).dot(c.homogeneous());
+                    
+                    Ellipse ell_project=tr->get_ellipsoid().project(project_matrix);
+                    BoundingBox box_project=ell_project.compute_box();
+                    if(BoundingBox::calculate_intersection_area(box_project,img_box)<0.3*box_project.area())
+                    {
+                        continue;
+                    }
+                    //proj_boxes[tr]=box_project;
 
-
-                }
+                
+                    /*
+                    //check occlsuions 
+                    std::unordered_set<Object*> hidden;
+                    for(auto it:proj_boxes)
+                    {
+                        if(it.first!=tr&&BoundingBox::calculate_iou(it.second,box_project)>0.9)
+                        {
+                            Eigen::Vector3d c=it.first->get_ellipsoid().get_center();
+                            double z2=Rt.row(2).dot(c.homogeneous());
+                            if(z<z2)
+                            {
+                                hidden.insert(it.first);
+                            }
+                            else
+                            {
+                                hidden.insert(tr);
+                            }
+                            
+                        }
+                    }
+                    for(auto hid:hidden)
+                    {
+                        proj_boxes.erase(hid);
+                    }
+                    */
+               }
                 
           }
+          /*
+          //find all the possible tricks which may be observed in this frame
+          std::vector<Object*> possible_tracks;
+          for(auto tr:objects_track)
+          {
+            BoundingBox box=tr->box_observed.back();
+            int last_observed_id=tr->frame_id.back();
+            if(last_observed_id+60>=current_frame_id&&
+               BoundingBox::calculate_intersection_area(box,img_box)>0.3*box.area())
+            {
+                possible_tracks.push_back(tr);
+            }
+            else if(proj_boxes.find(tr)!=proj_boxes.end())
+            {
+               possible_tracks.push_back(tr);
+            }   
+                
+        
+            
+          }
+          */
+
+
           
           
 
@@ -285,11 +344,11 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
         
         
         
-        }
-    
-    
-    
     }
+    
+    
+    
+}
 
 
 
