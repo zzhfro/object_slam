@@ -278,8 +278,8 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
                 }
                 
           }
-
-         
+          
+          
 
 
         

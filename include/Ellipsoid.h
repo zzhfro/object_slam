@@ -59,7 +59,7 @@ namespace ORB_SLAM2
    
    Ellipse project(const Eigen::Matrix<double, 3, 4>& P)
    {
-    Eigen::Matrix3d C_star=P*Q*P.transpose();
+    Eigen::Matrix3d C_star=P*Q.inverse()*P.transpose();
     Eigen::Matrix3d C=C_star.inverse();
     return Ellipse(C);
    }

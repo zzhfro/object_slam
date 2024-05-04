@@ -44,7 +44,7 @@ namespace ORB_SLAM2
            
     public:
         Eigen::Matrix3d C; //primal
-        double angle=0; 
+        double angle=0;   //-pi/2~pi/2
         Eigen::Vector2d axes=Eigen::Vector2d(-1, -1);
         Eigen::Vector2d center = Eigen::Vector2d(-1, -1);
        
