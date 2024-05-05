@@ -39,7 +39,7 @@ namespace ORB_SLAM2
 class Tracking;
 class LocalMapping;
 class KeyFrameDatabase;
-
+class Map;
 
 class LoopClosing
 {

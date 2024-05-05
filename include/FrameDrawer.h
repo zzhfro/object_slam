@@ -36,7 +36,7 @@ namespace ORB_SLAM2
 
 class Tracking;
 class Viewer;
-
+class Map;
 class FrameDrawer
 {
 public:

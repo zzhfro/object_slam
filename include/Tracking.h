@@ -51,6 +51,8 @@ class LocalMapping;
 class LoopClosing;
 class System;
 class DetectResult;
+class Initializer;
+
 class Tracking
 {  
 

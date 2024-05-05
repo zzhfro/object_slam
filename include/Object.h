@@ -10,10 +10,11 @@
 #include<opencv2/core/core.hpp>
 #include "Map.h"
 #include <mutex>
+#include "Frame.h"
 namespace ORB_SLAM2
 {
 class Map;
-
+class Tracking;
 
 enum class ObjectTrackStatus {
     ONLY_2D,    
@@ -31,6 +32,8 @@ public:
     
    }
    
+   Object* creat_new_object(int category,BoundingBox &box,double conf,Eigen::Matrix<double,3,4> &Rt,int frame_id,Tracking* track,KeyFrame* kf);
+
    void insert_Map(Map *pmap);
 
    ObjectTrackStatus get_status()
@@ -64,7 +67,8 @@ public:
    std::unordered_map<MapPoint*, int> associated_map_points;
 
    ObjectTrackStatus status = ObjectTrackStatus::ONLY_2D;
-
+   
+   Tracking* track=nullptr; 
 };
 
 
