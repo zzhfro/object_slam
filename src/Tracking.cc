@@ -352,6 +352,27 @@ if (mState == Tracking::OK)
             }
           }
 
+          //track object according to the point
+          int threshold_point_match=10;
+          //store which object the current box match
+          std::vector<int> matched_by_points(detect_num, -1);
+          //store the number of mathched point between the object and the  box
+          std::vector<std::vector<size_t>> num_matched_points(detect_num, std::vector<size_t>()); 
+          for(int i=0;i<detect_num;++i)
+          {
+            int detect_category=detect.ObjectBoxes[i].ObjectCategory;
+
+            for(int j=0;j<possible_tracks.size();++j)
+            {
+
+            }
+
+          }
+
+
+
+
+
           
 
 

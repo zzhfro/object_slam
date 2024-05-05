@@ -8,8 +8,8 @@
 #include "Ellipsoid.h"
 #include "MapPoint.h"
 #include<opencv2/core/core.hpp>
-
-
+#include "Map.h"
+#include <mutex>
 namespace ORB_SLAM2
 {
 class Map;
@@ -41,6 +41,10 @@ public:
    {
     return ellipsoid;
    }
+   std::unordered_map<MapPoint*, int> get_associate_mappoints()  {
+        std::unique_lock<std::mutex> lock(mutex_associated_map_points);
+        return associated_map_points;
+    }
 
    Ellipsoid ellipsoid;
    int category_id;
@@ -49,6 +53,10 @@ public:
    std::vector<BoundingBox> box_observed; //store the box observe the object
    std::vector<int> frame_id; //the correspondingframe
    //std::unordered_map<MapPoint*, int> associated_map_points_;
+   
+   std::mutex mutex_associated_map_points;
+   std::unordered_map<MapPoint*, int> associated_map_points;
+
    ObjectTrackStatus status = ObjectTrackStatus::ONLY_2D;
 
 };
