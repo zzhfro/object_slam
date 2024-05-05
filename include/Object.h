@@ -34,7 +34,7 @@ public:
     
    }
    
-   Object* creat_new_object(int category,BoundingBox &box,Eigen::Matrix<double,3,4> &Rt,int frame_id,Tracking* track,KeyFrame* kf);
+   static Object* creat_new_object(int category,BoundingBox &box,Eigen::Matrix<double,3,4> &Rt,int frame_id,Tracking* track,KeyFrame* kf);
 
    void insert_Map(Map *pmap);
 

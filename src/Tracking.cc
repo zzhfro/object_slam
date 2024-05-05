@@ -460,10 +460,16 @@ if (mState == Tracking::OK)
         {
             auto det=detect.ObjectBoxes[di];
             auto assigned_track_idx = assignment[di];
+            //if new objects
             if (assigned_track_idx >= static_cast<long>(possible_tracks.size()) || cost(di, assigned_track_idx) == 0) 
-                    {
-                        
-                    } 
+            {
+                 auto tr=Object::creat_new_object(det.ObjectCategory,det,Rt,current_frame_id,this,kf);
+                 objects_track.push_back(tr);            
+            } 
+            else  //associate box and objects
+            {
+
+            }
 
         }
 
