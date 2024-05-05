@@ -67,8 +67,56 @@ namespace ORB_SLAM2
         new_obj->color =  bgr;
      new_obj->tracker = track;
      new_obj->status = ObjectTrackStatus::ONLY_2D;   
-
+     
+     new_obj->uncertainty=0.5;
 
      return new_obj;
   } 
+  void Object::add_detection(BoundingBox& box,Eigen::Matrix<double,3,4>& Rt, int frame_idx, KeyFrame* kf)
+  {
+    unique_lock<mutex> lock(mutex_add_detection);
+    box_observed.push_back(box);
+    confs.push_back(box.ObjectConf);
+    frame_ids.push_back(frame_idx);
+    Rts.push_back(Rt);
+    if(kf)
+    {
+       keyframe_confs[kf]=box.ObjectConf;
+       box_observed_kf[kf]=box;
+       std::unique_lock<std::mutex> lock(mutex_associated_map_points);
+       for(int i=0;i<kf->mvKeys.size();++i)
+       {
+         MapPoint* point_3d=kf->mvpMapPoints[i];
+         if(point_3d)
+         {
+          cv::KeyPoint kp=kf->mvKeys[i];
+          if(box.if_keypoint_inbox(kp))
+          {
+               if (associated_map_points.find(point_3d) == associated_map_points.end())
+                        associated_map_points[point_3d] = 1;
+                      else
+                        associated_map_points[point_3d]++;
+          }
+
+         }
+
+       }
+
+    }
+
+    //update uncertainty
+    if(status==ObjectTrackStatus::IN_MAP)
+    {
+        double k = uncertainty / (uncertainty + std::exp(box.ObjectConf));
+        uncertainty = uncertainty * (1.0 - k);
+    }
+
+  }
+
+
+
+
+
+
+
 }

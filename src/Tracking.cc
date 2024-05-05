@@ -468,6 +468,8 @@ if (mState == Tracking::OK)
             } 
             else  //associate box and objects
             {
+              Object* associated_track=possible_tracks[assigned_track_idx];
+              associated_track->add_detection(det,Rt,current_frame_id,kf);
 
             }
 

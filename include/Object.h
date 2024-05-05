@@ -35,7 +35,8 @@ public:
    }
    
    static Object* creat_new_object(int category,BoundingBox &box,Eigen::Matrix<double,3,4> &Rt,int frame_id,Tracking* track,KeyFrame* kf);
-
+   
+   void add_detection(BoundingBox& box,Eigen::Matrix<double,3,4>& Rt, int frame_idx, KeyFrame* kf);
    void insert_Map(Map *pmap);
 
    ObjectTrackStatus get_status()
@@ -60,7 +61,7 @@ public:
    Ellipsoid ellipsoid;
    int category_id;
    int object_id;
-
+   double uncertainty = 0.0;
    static unsigned int object_factory_id;
    cv::Scalar color; //color is bounding to the category_id
    std::vector<BoundingBox> box_observed; //store the box observe the object
@@ -77,6 +78,8 @@ public:
    std::unordered_map<MapPoint*, int> associated_map_points;
 
    ObjectTrackStatus status = ObjectTrackStatus::ONLY_2D;
+
+   std::mutex mutex_add_detection;
    
    Tracking* tracker=nullptr; 
 };
