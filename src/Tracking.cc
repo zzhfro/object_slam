@@ -243,6 +243,11 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 if (mState == Tracking::OK) 
 //if track points successful then track the object
 {
+       KeyFrame *kf = mpLastKeyFrame;
+       if (!createdNewKeyFrame)
+       {
+            kf = nullptr;
+       }
        Eigen::Matrix<double,3,4> Rt = RtFromT(mCurrentFrame.mTcw);
        double z_mean=0;
        unsigned int z_nb = 0;
@@ -538,7 +543,8 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
 }
 
 void Tracking::Track()
-{
+{   
+    createdNewKeyFrame = false;
     if(mState==NO_IMAGES_YET)
     {
         mState = NOT_INITIALIZED;
@@ -728,8 +734,10 @@ void Tracking::Track()
 
             // Check if we need to insert a new keyframe
             if(NeedNewKeyFrame())
+            {
                 CreateNewKeyFrame();
-
+                createdNewKeyFrame = true;
+            }
             // We allow points with high innovation (considererd outliers by the Huber Function)
             // pass to the new keyframe, so that bundle adjustment will finally decide
             // if they are outliers or not. We don't want next frame to estimate its position

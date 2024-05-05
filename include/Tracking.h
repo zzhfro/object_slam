@@ -96,7 +96,7 @@ public:
     int mSensor;
 
     unsigned long current_frame_id;
-
+    bool createdNewKeyFrame = false;
     // Current Frame
     Frame mCurrentFrame;
     cv::Mat mImGray;
