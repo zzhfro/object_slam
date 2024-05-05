@@ -11,6 +11,8 @@
 #include "Map.h"
 #include <mutex>
 #include "Frame.h"
+#include <Eigen/Dense>
+
 namespace ORB_SLAM2
 {
 class Map;
@@ -32,7 +34,7 @@ public:
     
    }
    
-   Object* creat_new_object(int category,BoundingBox &box,double conf,Eigen::Matrix<double,3,4> &Rt,int frame_id,Tracking* track,KeyFrame* kf);
+   Object* creat_new_object(int category,BoundingBox &box,Eigen::Matrix<double,3,4> &Rt,int frame_id,Tracking* track,KeyFrame* kf);
 
    void insert_Map(Map *pmap);
 
@@ -58,9 +60,17 @@ public:
    Ellipsoid ellipsoid;
    int category_id;
    int object_id;
+
+   static unsigned int object_factory_id;
    cv::Scalar color; //color is bounding to the category_id
    std::vector<BoundingBox> box_observed; //store the box observe the object
-   std::vector<int> frame_id; //the correspondingframe
+   std::vector<int> frame_ids; //the correspondingframe
+   std::vector<Eigen::Matrix<double,3,4>> Rts;
+
+   std::vector<double> confs;
+   
+   std::unordered_map<KeyFrame*,double> keyframe_confs;
+   std::unordered_map<KeyFrame*,BoundingBox> box_observed_kf;
    //std::unordered_map<MapPoint*, int> associated_map_points_;
    
    std::mutex mutex_associated_map_points;
@@ -68,7 +78,7 @@ public:
 
    ObjectTrackStatus status = ObjectTrackStatus::ONLY_2D;
    
-   Tracking* track=nullptr; 
+   Tracking* tracker=nullptr; 
 };
 
 

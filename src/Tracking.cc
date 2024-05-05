@@ -320,7 +320,7 @@ if (mState == Tracking::OK)
           for(auto tr:objects_track)
           {
             BoundingBox box=tr->box_observed.back();
-            int last_observed_id=tr->frame_id.back();
+            int last_observed_id=tr->frame_ids.back();
             if(last_observed_id+60>=current_frame_id&&
                BoundingBox::calculate_intersection_area(box,img_box)>0.3*box.area())
             {
@@ -413,7 +413,7 @@ if (mState == Tracking::OK)
                          * cost : max(IOU(D,B),IOU(D,proj)
                         */
 
-                       if(tr->frame_id.back()+30>current_frame_id)
+                       if(tr->frame_ids.back()+30>current_frame_id)
                        {
                         iou_2d=BoundingBox::calculate_iou(tr->box_observed.back(),detect_box);
                        }
