@@ -361,14 +361,34 @@ if (mState == Tracking::OK)
           for(int i=0;i<detect_num;++i)
           {
             int detect_category=detect.ObjectBoxes[i].ObjectCategory;
+            
+            int max_num_matches = 0;
+            int best_matched_track = 0;
 
             for(int j=0;j<possible_tracks.size();++j)
             {
                 auto tr_map_points = possible_tracks[j]->get_associate_mappoints();
-                 
-            }
+                int n = count_set_map_intersection(assoc_map_points[i], tr_map_points);
+                if (detect_category != possible_tracks[j]->get_category_id())  
+                {
+                    n = 0;
+                }
+                if(n>max_num_matches)
+                {
+                    max_num_matches=n;
+                    best_matched_track = j;
 
-          }
+                }
+                num_matched_points[i].push_back(n);
+
+            }
+             if (max_num_matches > threshold_point_match&&
+                detect.ObjectBoxes[i].ObjectCategory == possible_tracks[best_matched_track]->get_category_id()) 
+                {
+                          matched_by_points[i] = best_matched_track;
+                }
+
+         }
 
 
 

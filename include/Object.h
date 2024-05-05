@@ -41,6 +41,12 @@ public:
    {
     return ellipsoid;
    }
+
+   int get_category_id()
+   {
+    return category_id;
+   }
+   
    std::unordered_map<MapPoint*, int> get_associate_mappoints()  {
         std::unique_lock<std::mutex> lock(mutex_associated_map_points);
         return associated_map_points;
