@@ -364,7 +364,8 @@ if (mState == Tracking::OK)
 
             for(int j=0;j<possible_tracks.size();++j)
             {
-
+                auto tr_map_points = possible_tracks[j]->get_associate_mappoints();
+                 
             }
 
           }
