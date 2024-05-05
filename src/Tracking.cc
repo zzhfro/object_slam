@@ -20,7 +20,7 @@
 
 
 #include "Tracking.h"
-
+#include <dlib/optimization/max_cost_assignment.h>
 #include<opencv2/core/core.hpp>
 #include<opencv2/features2d/features2d.hpp>
 #include <opencv2/core.hpp>
@@ -39,7 +39,7 @@
 #include<mutex>
 #include <opencv2/core/eigen.hpp>
 #include <unordered_set>
-
+#include <algorithm>
 
 
 using namespace std;
@@ -389,6 +389,84 @@ if (mState == Tracking::OK)
                 }
 
          }
+         
+         // assignment process
+         int m = std::max(int(possible_tracks.size()), detect_num);
+         dlib::matrix<long> cost = dlib::zeros_matrix<long>(m, m);
+         std::vector<long> assignment(m, std::numeric_limits<long>::max()); 
+         double MIN_2D_IOU_THRESH=0.2;
+         double MIN_3D_IOU_THRESH=0.3;
+         if(detect_num>0)
+         {  
+            for (int di = 0; di < detect_num; ++di) 
+            {
+                BoundingBox detect_box=detect.ObjectBoxes[di];
+                for(int ti=0;ti<possible_tracks.size();++ti)
+                {
+                    auto tr=possible_tracks[ti];
+                    if(tr->get_category_id()==detect_box.ObjectCategory)
+                    {
+                        double iou_2d = 0;
+                        double iou_3d = 0;
+                        /**
+                         * B is the last box proj is the project box
+                         * cost : max(IOU(D,B),IOU(D,proj)
+                        */
+
+                       if(tr->frame_id.back()+30>current_frame_id)
+                       {
+                        iou_2d=BoundingBox::calculate_iou(tr->box_observed.back(),detect_box);
+                       }
+                       if(proj_boxes.find(tr)!=proj_boxes.end())
+                       {
+                        iou_3d=BoundingBox::calculate_iou(proj_boxes[tr],detect_box);
+                       }
+                       
+                       //if it is lower than thereshold it is useless
+                       if (iou_2d <MIN_2D_IOU_THRESH ) iou_2d = 0;
+
+                       if (iou_3d < MIN_3D_IOU_THRESH) iou_3d = 0;
+
+                       cost(di, ti) = std::max(iou_2d, iou_3d) * 1000;
+
+                    }
+                }
+                // mathced by point is more reliable and trustable
+                if (matched_by_points[di] != -1) 
+                {
+                  cost(di, matched_by_points[di]) = std::numeric_limits<int>::max();
+                }
+
+                
+            
+            
+            }
+            assignment = dlib::max_cost_assignment(cost); // solve
+
+         
+         }
+
+         /**
+          * build new track
+         */
+        std::vector<Object*> new_tracks;
+
+        for(int di=0;di<detect_num;++di)
+        {
+            auto det=detect.ObjectBoxes[di];
+            auto assigned_track_idx = assignment[di];
+            if (assigned_track_idx >= static_cast<long>(possible_tracks.size()) || cost(di, assigned_track_idx) == 0) 
+                    {
+                        
+                    } 
+
+        }
+
+
+
+              
+
+
 
 
 

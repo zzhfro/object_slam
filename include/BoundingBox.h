@@ -15,7 +15,10 @@
            : x(_x), y(_y), w(_w), h(_h),  ObjectCategory(_ObjectCategory),ObjectConf(_ObjectConf)
        {
        }
-      
+      BoundingBox()
+      {
+        
+      }
        double area()
        {
         return w*h;
