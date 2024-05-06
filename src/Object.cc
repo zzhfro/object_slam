@@ -5,7 +5,7 @@
 #include "Tracking.h"
 namespace ORB_SLAM2
 {
-
+  #define TO_RAD(x) 0.01745329251 * (x)
   unsigned int Object::object_factory_id=0;
   void Object::insert_Map(Map *pmap) 
    {
@@ -129,6 +129,18 @@ namespace ORB_SLAM2
      v1.normalize();
 
      return std::atan2(v0.cross(v1).norm(), v0.dot(v1));
+  
+
+  }
+
+  bool Object::restruct_from_center()
+  {
+     if(this->get_angled_difference()<TO_RAD(10.0))
+     {
+        //only above 10 thne begin restruct
+        return false;
+     }
+     
 
 
   }
