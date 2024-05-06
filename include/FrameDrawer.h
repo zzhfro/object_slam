@@ -21,6 +21,7 @@
 #ifndef FRAMEDRAWER_H
 #define FRAMEDRAWER_H
 
+#include"ObjectColorManager.h"
 #include"BoundingBox.h"
 #include "Tracking.h"
 #include "MapPoint.h"
@@ -67,7 +68,7 @@ protected:
     std::vector<BoundingBox> boxes_drawer;
     DetectResult* detect_drawer;
     int mState;
-
+    ObjectColorManager object_color_manager;
     Map* mpMap;
 
     std::mutex mMutex;

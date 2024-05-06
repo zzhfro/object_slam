@@ -23,6 +23,10 @@ ObjectColorManager(int category_num,const std::string& filename) {
         std::cout<<"color init success"<<std::endl;
         initializeNameVector(filename);
     }
+    ObjectColorManager()
+    {
+        
+    }
 
     void initializeColorVector(int category_num) {
         // 这里使用简单的固定颜色生成算法，可以根据需要自定义

@@ -23,7 +23,7 @@
 #include "BoundingBox.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
+#include"ObjectColorManager.h"
 #include<mutex>
 
 namespace ORB_SLAM2
@@ -33,6 +33,8 @@ FrameDrawer::FrameDrawer(Map* pMap):mpMap(pMap)
 {
     mState=Tracking::SYSTEM_NOT_READY;
     mIm = cv::Mat(480,640,CV_8UC3, cv::Scalar(0,0,0));
+    object_color_manager=ObjectColorManager(80,"/home/zzhfro/code/object_slam/ORB_SLAM2/Examples/RGB-D/obj.txt");
+    
 }
 
 cv::Mat FrameDrawer::DrawFrame()
@@ -136,15 +138,18 @@ cv::Mat FrameDrawer::DrawDetect(cv::Mat &img)
   {
     cv::Scalar color;
     BoundingBox box=boxes[i];
+    auto info = object_color_manager.getObjectInfo(box.ObjectCategory);
+    color = info.first;
+    std::string name = info.second;
     cv::rectangle(img, cv::Point2i(box.x-box.w/2, box.y-box.h/2),
                            cv::Point2i(box.x+box.w/2, box.y+box.h/2),
                            color,
-                           1);
+                           2);
        {
             std::stringstream ss;
             ss << std::fixed << std::setprecision(2) << box.ObjectConf;
             // cv::putText(img, std::to_string(d.id) + "(" + std::to_string(d.category_id) + ") | " + ss.str(),
-            cv::putText(img,  ss.str() + "|" + std::to_string(box.ObjectCategory),
+            cv::putText(img, name+"|"+ ss.str() + "|" + std::to_string(box.ObjectCategory),
                         cv::Point2i(box.x-box.w/2-10, box.y-box.h/2-5), cv::FONT_HERSHEY_DUPLEX,
                         0.55, cv::Scalar(255, 255, 255), 1, false);
         }                       
