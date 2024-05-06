@@ -6,45 +6,60 @@
 #include <vector>
 #include <unordered_map>
 #include <opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp>
+/**
+ * created by zzh 2024.5
+ * 
+ * 
+*/
 namespace ORB_SLAM2
 {
-class ObjectColorManager {
+  class ObjectColorManager {
 private:
-    std::unordered_map<int, cv::Scalar> color_map;
-    std::unordered_map<int, std::string> name_map;
+    std::vector<cv::Scalar> color_vector;
+    std::vector<std::string> name_vector;
 
 public:
-    ObjectColorManager(const std::string& filename) {
+ObjectColorManager(int category_num,const std::string& filename) {
+        initializeColorVector(category_num);
+        initializeNameVector(filename);
+    }
+
+    void initializeColorVector(int category_num) {
+        // 这里使用简单的固定颜色生成算法，可以根据需要自定义
+        for (int i = 0; i < category_num; ++i) {
+            int b = i * 10 % 256;
+            int g = i * 20 % 256;
+            int r = i * 30 % 256;
+            cv::Scalar color(b, g, r);
+            color_vector[i] = color;
+        }
+    }
+     void initializeNameVector(const std::string& filename) 
+     {
+        // 这里假设物体类别的名称是一个通用的名称，例如 "object" + 类别ID
         std::ifstream file(filename);
         if (!file.is_open()) {
             std::cerr << "Error: Unable to open file " << filename << std::endl;
             return;
         }
 
-        int category_id;
-        int r, g, b;
+        std::vector<std::string> object_names;
         std::string name;
-        while (file >> category_id >> r >> g >> b >> name) {
-            cv::Scalar color(b, g, r); // 注意颜色顺序为 BGR
-            color_map[category_id] = color;
-            name_map[category_id] = name;
+        while (std::getline(file, name)) {
+            object_names.push_back(name);
         }
         file.close();
     }
 
-    std::pair<cv::Scalar, std::string> getObjectInfo(int category_id) {
-        cv::Scalar color(0, 0, 0); // 默认黑色
+    std::pair<cv::Scalar, std::string> getObjectInfo(int category_id) 
+    {
+        cv::Scalar color(0, 0, 0); // 默认颜色为黑色
         std::string name = "Unknown";
 
-        auto it_color = color_map.find(category_id);
-        if (it_color != color_map.end()) {
-            color = it_color->second;
-        }
+        color=color_vector[category_id];
 
-        auto it_name = name_map.find(category_id);
-        if (it_name != name_map.end()) {
-            name = it_name->second;
-        }
+        name=name_vector[category_id];
 
         return std::make_pair(color, name);
     }
