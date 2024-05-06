@@ -79,6 +79,9 @@ add_executable(semantic_slam
 Examples/RGB-D/semantic_slam.cc)
 target_link_libraries(semantic_slam ${PROJECT_NAME})
 
+add_executable(test_color_manager
+Examples/RGB-D/test_color_manager.cc)
+target_link_libraries(test_color_manager ${PROJECT_NAME})
 
 
 

@@ -4,8 +4,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <opencv2/core/core.hpp>
 #include <opencv2/core/core.hpp>
 /**
  * created by zzh 2024.5
@@ -22,6 +20,7 @@ private:
 public:
 ObjectColorManager(int category_num,const std::string& filename) {
         initializeColorVector(category_num);
+        std::cout<<"color init success"<<std::endl;
         initializeNameVector(filename);
     }
 
@@ -32,7 +31,7 @@ ObjectColorManager(int category_num,const std::string& filename) {
             int g = i * 20 % 256;
             int r = i * 30 % 256;
             cv::Scalar color(b, g, r);
-            color_vector[i] = color;
+            color_vector.push_back(color);
         }
     }
      void initializeNameVector(const std::string& filename) 
@@ -44,10 +43,9 @@ ObjectColorManager(int category_num,const std::string& filename) {
             return;
         }
 
-        std::vector<std::string> object_names;
         std::string name;
         while (std::getline(file, name)) {
-            object_names.push_back(name);
+            name_vector.push_back(name);
         }
         file.close();
     }
