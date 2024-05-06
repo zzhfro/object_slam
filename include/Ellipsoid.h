@@ -46,14 +46,17 @@ namespace ORB_SLAM2
     {
       return axes;
     }
+
     Eigen::Matrix3d get_R()
     {
       return R;
     }
+
    Eigen::Vector3d get_center()
    {
     return center;
    }
+
    Eigen::Matrix<double, Eigen::Dynamic, 3> generate_ellipsoid_points(int azimuths, int elevations, int sampling);
    Eigen::Matrix<double, Eigen::Dynamic, 3> generate_point_cloud(int sampling);
    
@@ -64,7 +67,10 @@ namespace ORB_SLAM2
     return Ellipse(C);
    }
 
-
+   static std::pair<bool, Ellipsoid>
+   reconstruct_ellipsoid_from_center(const std::vector<BoundingBox, Eigen::aligned_allocator<BoundingBox>>& bboxes,
+                            const std::vector<Eigen::Matrix<double,3,4>, Eigen::aligned_allocator<Eigen::Matrix<double,3,4>>>& Rts, 
+                            const Eigen::Matrix3d& K);
     public:
         Eigen::Matrix4d Q;
         Eigen::Vector3d axes=Eigen::Vector3d(-1,-1,-1);

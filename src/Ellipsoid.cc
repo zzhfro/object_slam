@@ -79,6 +79,68 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> Ellipsoid::generate_point_cloud(int sam
    
     return pts_transf.transpose();
 }
+Eigen::Vector3d TriangulatePoints(const std::vector<Eigen::Vector2d, Eigen::aligned_allocator<Eigen::Vector2d>>& points,
+                                  const std::vector<Eigen::Matrix<double,3,4>, Eigen::aligned_allocator<Eigen::Matrix<double,3,4>>>& projections)
+{
+    const int n = projections.size();
+    Eigen::Matrix<double, Eigen::Dynamic, 4> A(2*n, 4);
+    for (int i = 0; i < n; ++i) {
+        A.row(i*2) = points[i][0] * projections[i].row(2) - projections[i].row(0);
+        A.row(i*2+1) = points[i][1] * projections[i].row(2) - projections[i].row(1);
+    }
+    Eigen::JacobiSVD<Eigen::Matrix<double, Eigen::Dynamic, 4>> svd(A, Eigen::ComputeFullV);
+    Eigen::MatrixXd V = svd.matrixV();
+    Eigen::Vector4d X = V.col(3);
+    Eigen::Vector3d center = X.head(3) / X[3];
+    return center;
+}
 
+std::pair<bool, Ellipsoid>
+   Ellipsoid::reconstruct_ellipsoid_from_center(const std::vector<BoundingBox, Eigen::aligned_allocator<BoundingBox>>& boxes,
+                            const std::vector<Eigen::Matrix<double,3,4>, Eigen::aligned_allocator<Eigen::Matrix<double,3,4>>>& Rts, 
+                            const Eigen::Matrix3d& K)
+   { 
+    /**
+     * r=1/n*(sum(w/fx+h/fy)*0.5)
+     * 
+     * 
+    */
+     int n=boxes.size();
+     std::vector<double> sizes(n);
+     std::vector<Eigen::Matrix<double,3,4>, Eigen::aligned_allocator<Eigen::Matrix<double,3,4>>> projections(n);
+     std::vector<Eigen::Vector2d, Eigen::aligned_allocator<Eigen::Vector2d>> points2d(n);
+    for (size_t i = 0; i < n; ++i) {
+        const auto& bb = boxes[i];
+        points2d[i] = BoundingBox::box_center(bb);
+        projections[i] = K * Rts[i];
+        sizes[i] = 0.5 * (bb.w / K(0, 0) + bb.h / K(1, 1));
+    }
+
+    Eigen::Vector3d center = TriangulatePoints(points2d, projections);
+
+    double mean_3d_size=0;
+    for(int i=0;i<n;++i)
+    {
+        Eigen::Vector3d X_cam = Rts[i] * center.homogeneous();
+        if (X_cam.z() < 0) {
+            std::cerr << "Reconstruction failed: z is negative" << std::endl;
+            return {false, Ellipsoid()};
+        }
+        Eigen::Vector3d X_img = K * X_cam;
+        double u = X_img[0] / X_img[2];
+        double v = X_img[1] / X_img[2];
+
+        if ((points2d[i] - Eigen::Vector2d(u, v)).norm() > 100) 
+        {
+            std::cerr << "Reconstruction failed: reconstructed center is too far from a detection" << std::endl;
+            return {false, Ellipsoid()};
+        }
+
+        mean_3d_size += X_cam.z() * sizes[i];
+
+    }
+    mean_3d_size /= sizes.size();
+    return {true, Ellipsoid(Eigen::Vector3d::Ones() * mean_3d_size * 0.5, Eigen::Matrix3d::Identity(), center)};
+   }
 
 };

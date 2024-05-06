@@ -116,14 +116,14 @@ namespace ORB_SLAM2
   
   double Object::get_angled_difference()
   {
-     Eigen::Vector3d c0=box_center(box_observed.back()).homogeneous();
+     Eigen::Vector3d c0=BoundingBox::box_center(box_observed.back()).homogeneous();
      Eigen::Matrix3d K;
      cv::cv2eigen(tracker->GetK(), K);
      Eigen::Matrix3d K_inv = K.inverse();
      Eigen::Vector3d v0 = K_inv * c0;
      v0=Rts.back().block<3,3>(0,0).transpose()*(v0-Rts.back().block<3, 1>(0, 3));
      v0.normalize();
-     Eigen::Vector3d c1=box_center(box_observed[0]).homogeneous();
+     Eigen::Vector3d c1=BoundingBox::box_center(box_observed[0]).homogeneous();
      Eigen::Vector3d v1 = K_inv * c1;
      v1=Rts[0].block<3,3>(0,0).transpose()*(v0-Rts[0].block<3, 1>(0, 3));
      v1.normalize();

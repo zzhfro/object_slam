@@ -1,6 +1,7 @@
  #ifndef BOUNDING_BOX_H
  #define BOUNDING_BOX_H
  #include <iostream>
+ #include <Eigen/Dense>
  #include<opencv2/core/core.hpp>
 #include<opencv2/features2d/features2d.hpp>
  namespace ORB_SLAM2{
@@ -54,7 +55,8 @@
                 std::max(0.0, intersection_y_max - intersection_y_min);
        }
 
-       bool if_keypoint_inbox(cv::KeyPoint kp) const {
+       bool if_keypoint_inbox(cv::KeyPoint kp) const 
+       {
         double x=kp.pt.x;
         double y=kp.pt.y;
         double minX = x - w / 2.0;
@@ -62,6 +64,11 @@
         double minY = y - h / 2.0;
         double maxY = y + h / 2.0;
         return (x >= minX && x <= maxX && y >= minY && y <= maxY);
+    }
+
+     static inline Eigen::Vector2d box_center(const BoundingBox& box) 
+    {
+    return Eigen::Vector2d(box.x,box.y);
     }
    };
 

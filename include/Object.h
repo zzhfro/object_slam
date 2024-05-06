@@ -42,10 +42,7 @@ public:
    
    double get_angled_difference();
    
-   inline Eigen::Vector2d box_center(const BoundingBox& box) 
-   {
-    return Eigen::Vector2d(box.x,box.y);
-   }
+  
    
    ObjectTrackStatus get_status()
    {
