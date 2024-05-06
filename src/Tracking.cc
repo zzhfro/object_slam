@@ -214,6 +214,7 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
 cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp,DetectResult &detect)
 {   
     current_frame_id=current_frame_id+1;
+    track_detect=&detect;
     mImGray = imRGB;
     cv::Mat imDepth = imD;
 
@@ -488,13 +489,18 @@ if (mState == Tracking::OK)
                 if ((tr->get_obs_num() > 10 && tr->get_status() == ObjectTrackStatus::ONLY_2D) 
                     ||(tr->get_obs_num() % 2 == 0 && tr->get_status() == ObjectTrackStatus::INITIALIZED)) 
                     {
-                        ;
+                        bool status_rec=tr->restruct_from_center();
+                        std::cout<<"success"<<std::endl;
                     }
               }
             }
         }
+        std::cout<<objects_track.size()<<std::endl;
         
-
+        for (auto& tr : objects_track)
+        {
+           tr->insert_Map(mpMap);
+        }
 
               
 

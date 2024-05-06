@@ -11,6 +11,7 @@
 namespace ORB_SLAM2
 {
 class BoundingBox;  
+
 class DetectResult
 {
 public:
@@ -70,7 +71,10 @@ public:
       std::cout<<"object_conf"<<ObjectBoxes[i].ObjectConf<<std::endl;                          
     }
    }
-   
+   DetectResult()
+   {
+
+   }
    DetectResult(string name,int num,double category[],double conf[] , double boxes[])
    { 
      image_num=name;

@@ -152,6 +152,7 @@ namespace ORB_SLAM2
      ellipsoid=ellipsoid_tmp;
      if (status == ObjectTrackStatus::ONLY_2D)
         status = ObjectTrackStatus::INITIALIZED;
+     return true;   
 
   }
 

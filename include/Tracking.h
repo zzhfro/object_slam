@@ -187,7 +187,7 @@ protected:
 
     //Map
     Map* mpMap;
-
+    
     //Calibration matrix
     cv::Mat mK;
     cv::Mat mDistCoef;
@@ -219,7 +219,8 @@ protected:
 
     //Color order (true RGB, false BGR, ignored if grayscale)
     bool mbRGB;
-
+    
+    DetectResult* track_detect;
     list<MapPoint*> mlpTemporalPoints;
 };
 

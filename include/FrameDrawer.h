@@ -21,13 +21,14 @@
 #ifndef FRAMEDRAWER_H
 #define FRAMEDRAWER_H
 
+#include"BoundingBox.h"
 #include "Tracking.h"
 #include "MapPoint.h"
 #include "Map.h"
-
+#include "ObjectDetect.h"
+#include "Frame.h"
 #include<opencv2/core/core.hpp>
 #include<opencv2/features2d/features2d.hpp>
-
 #include<mutex>
 
 
@@ -37,6 +38,8 @@ namespace ORB_SLAM2
 class Tracking;
 class Viewer;
 class Map;
+class DetectResult;
+
 class FrameDrawer
 {
 public:
@@ -47,7 +50,7 @@ public:
 
     // Draw last processed frame.
     cv::Mat DrawFrame();
-
+    cv::Mat DrawDetect();
 protected:
 
     void DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText);
@@ -61,6 +64,8 @@ protected:
     int mnTracked, mnTrackedVO;
     vector<cv::KeyPoint> mvIniKeys;
     vector<int> mvIniMatches;
+    
+    DetectResult* detect_drawer;
     int mState;
 
     Map* mpMap;

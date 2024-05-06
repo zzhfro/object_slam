@@ -125,7 +125,10 @@ cv::Mat FrameDrawer::DrawFrame()
     return imWithInfo;
 }
 
+cv::Mat FrameDrawer::DrawDetect()
+{
 
+}
 void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText)
 {
     stringstream s;
@@ -198,6 +201,8 @@ void FrameDrawer::Update(Tracking *pTracker)
         }
     }
     mState=static_cast<int>(pTracker->mLastProcessedState);
+
+    
 }
 
 } //namespace ORB_SLAM
