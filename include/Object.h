@@ -38,7 +38,11 @@ public:
    
    void add_detection(BoundingBox& box,Eigen::Matrix<double,3,4>& Rt, int frame_idx, KeyFrame* kf);
    void insert_Map(Map *pmap);
-
+   double get_angled_difference();
+   inline Eigen::Vector2d box_center(const BoundingBox& box) 
+   {
+    return Eigen::Vector2d(box.x,box.y);
+  }
    ObjectTrackStatus get_status()
    {
     return status;
@@ -52,12 +56,24 @@ public:
    {
     return category_id;
    }
-   
+   int get_last_obsframe_id()
+   {
+    return frame_ids.back();
+   }
+   int get_obs_num()
+   {
+    return box_observed.size();
+   }
+   int get_obs_kf_num()
+   {
+    return box_observed_kf.size();
+   }
+
    std::unordered_map<MapPoint*, int> get_associate_mappoints()  {
         std::unique_lock<std::mutex> lock(mutex_associated_map_points);
         return associated_map_points;
     }
-
+   
    Ellipsoid ellipsoid;
    int category_id;
    int object_id;

@@ -398,6 +398,7 @@ if (mState == Tracking::OK)
          // assignment process
          int m = std::max(int(possible_tracks.size()), detect_num);
          dlib::matrix<long> cost = dlib::zeros_matrix<long>(m, m);
+         
          std::vector<long> assignment(m, std::numeric_limits<long>::max()); 
          double MIN_2D_IOU_THRESH=0.2;
          double MIN_3D_IOU_THRESH=0.3;
@@ -474,7 +475,25 @@ if (mState == Tracking::OK)
             }
 
         }
-
+        /**
+         * 
+         * init track
+        */
+        if(!mbOnlyTracking)
+        {
+            for (auto& tr : objects_track)
+            {
+              if(tr->get_last_obsframe_id()==current_frame_id)
+              {
+                if ((tr->get_obs_num() > 10 && tr->get_status() == ObjectTrackStatus::ONLY_2D) 
+                    ||(tr->get_obs_num() % 2 == 0 && tr->get_status() == ObjectTrackStatus::INITIALIZED)) 
+                    {
+                        ;
+                    }
+              }
+            }
+        }
+        
 
 
               
