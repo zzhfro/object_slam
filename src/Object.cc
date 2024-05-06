@@ -48,13 +48,13 @@ namespace ORB_SLAM2
         
     } else if (new_obj->category_id == 26 || new_obj->category_id == 24) { // bag
         col = cv::Scalar(184, 216, 176);
-    } else if (new_obj->category_id == 58) { // plant
+    } else if (new_obj->category_id == 62) { 
         col = cv::Scalar(6, 191, 0);
-    } else if (new_obj->category_id == 75) { // vase
+    } else if (new_obj->category_id == 77) { 
         col = cv::Scalar(173, 105, 42);
-    } else if (new_obj->category_id == 49) { // orange
+    } else if (new_obj->category_id == 64) { 
         col = cv::Scalar(144, 0, 255);
-    } else if (new_obj->category_id == 73) { // book
+    } else if (new_obj->category_id == 66) { 
         col = cv::Scalar(0, 110, 255);
     } else if (new_obj->category_id == 41) { // cup
         col = cv::Scalar(255, 0, 0);

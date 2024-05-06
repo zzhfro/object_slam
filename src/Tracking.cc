@@ -337,7 +337,7 @@ if (mState == Tracking::OK)
                possible_tracks.push_back(tr);
             }   
                 
-        
+          
             
           }
           std::vector<std::unordered_set<MapPoint*>> assoc_map_points(detect_num);
@@ -444,12 +444,17 @@ if (mState == Tracking::OK)
                   cost(di, matched_by_points[di]) = std::numeric_limits<int>::max();
                 }
 
-                
-            
             
             }
             assignment = dlib::max_cost_assignment(cost); // solve
-
+            std::cout<<"cost in dlib"<<std::endl;
+            std::cout<<cost<<std::endl;
+            std::cout<<"#########"<<std::endl;
+            std::cout<<"assiagnment"<<std::endl;
+            for(int i=0;i<assignment.size();++i)
+            {
+                std::cout<<assignment[i]<<"  ";
+            }
          
          }
 
@@ -465,6 +470,7 @@ if (mState == Tracking::OK)
             //if new objects
             if (assigned_track_idx >= static_cast<long>(possible_tracks.size()) || cost(di, assigned_track_idx) == 0) 
             {
+                std::cout<<"success"<<std::endl;
                  auto tr=Object::creat_new_object(det.ObjectCategory,det,Rt,current_frame_id,this,kf);
                  objects_track.push_back(tr);            
             } 
@@ -488,19 +494,25 @@ if (mState == Tracking::OK)
               {
                 if ((tr->get_obs_num() > 10 && tr->get_status() == ObjectTrackStatus::ONLY_2D) 
                     ||(tr->get_obs_num() % 2 == 0 && tr->get_status() == ObjectTrackStatus::INITIALIZED)) 
-                    {
+                    {   
                         bool status_rec=tr->restruct_from_center();
-                        std::cout<<"success"<<std::endl;
+                        
                     }
               }
             }
         }
-        std::cout<<objects_track.size()<<std::endl;
         
         for (auto& tr : objects_track)
         {
-           tr->insert_Map(mpMap);
+            if(tr->status==ObjectTrackStatus::INITIALIZED)
+            {
+                tr->insert_Map(mpMap);
+            }
+           
         }
+
+        
+        
 
               
 
