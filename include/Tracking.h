@@ -116,7 +116,7 @@ public:
     list<KeyFrame*> mlpReferences;
     list<double> mlFrameTimes;
     list<bool> mlbLost;
-
+    DetectResult* track_detect;
     // True if local mapping is deactivated and we are performing only localization
     bool mbOnlyTracking;
 
@@ -220,7 +220,7 @@ protected:
     //Color order (true RGB, false BGR, ignored if grayscale)
     bool mbRGB;
     
-    DetectResult* track_detect;
+    
     list<MapPoint*> mlpTemporalPoints;
 };
 

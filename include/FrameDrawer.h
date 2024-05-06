@@ -50,7 +50,7 @@ public:
 
     // Draw last processed frame.
     cv::Mat DrawFrame();
-    cv::Mat DrawDetect();
+    cv::Mat DrawDetect(cv::Mat &img);
 protected:
 
     void DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText);
@@ -64,7 +64,7 @@ protected:
     int mnTracked, mnTrackedVO;
     vector<cv::KeyPoint> mvIniKeys;
     vector<int> mvIniMatches;
-    
+    std::vector<BoundingBox> boxes_drawer;
     DetectResult* detect_drawer;
     int mState;
 

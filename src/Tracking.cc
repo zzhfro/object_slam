@@ -237,7 +237,7 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
         imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
 
     mCurrentFrame = Frame(mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth,detect);
-
+     
     Track();
 
 
@@ -527,7 +527,7 @@ if (mState == Tracking::OK)
 }
 
 
-
+   mpFrameDrawer->Update(this);
 
     return mCurrentFrame.mTcw.clone();
 }
@@ -595,7 +595,7 @@ void Tracking::Track()
         else
             MonocularInitialization();
 
-        mpFrameDrawer->Update(this);
+        //mpFrameDrawer->Update(this);
 
         if(mState!=OK)
             return;
@@ -727,7 +727,7 @@ void Tracking::Track()
             mState=LOST;
 
         // Update drawer
-        mpFrameDrawer->Update(this);
+        //mpFrameDrawer->Update(this);
 
         // If tracking were good, check if we insert a keyframe
         if(bOK)

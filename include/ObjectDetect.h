@@ -16,7 +16,7 @@ class DetectResult
 {
 public:
   
-   string image_num; //in fact it is not necessary but i use it for check 
+   string image_name; //in fact it is not necessary but i use it for check 
    int NumObject;
    //std::vector<int> ObjectCategory;
    //std::vector<double> ObjectConf;
@@ -61,7 +61,7 @@ public:
 
    void print_detect() //for debug 
    {
-    std::cout<<image_num<<std::endl;
+    std::cout<<image_name<<std::endl;
     std::cout<<"object_num:"<<NumObject<<std::endl;
     for(int i=0;i<NumObject;++i)
     {
@@ -77,7 +77,7 @@ public:
    }
    DetectResult(string name,int num,double category[],double conf[] , double boxes[])
    { 
-     image_num=name;
+     image_name=name;
      NumObject=num;
      for(int i=0;i<NumObject;++i)
      {
@@ -89,7 +89,7 @@ public:
    
    DetectResult(string name,int num,std::vector<double> &category,std::vector<double> &conf , std::vector<double> &boxes)
    {
-     image_num=name;
+     image_name=name;
      NumObject=num;
      for(int i=0;i<NumObject;++i)
      {

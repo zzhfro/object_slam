@@ -12,6 +12,7 @@
 #include<opencv2/core/core.hpp>
 #include<System.h>
 #include<ObjectDetect.h>
+#include"BoundingBox.h"
 using namespace std;
 
 std::vector<int> dynamic_object={0}; 
@@ -21,6 +22,8 @@ void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageF
                 vector<string> &vstrImageFilenamesD, vector<double> &vTimestamps);
 
 void LoadDetection(const std::string& filename, std::vector<ORB_SLAM2::DetectResult> &DetectResults);
+bool matchDetection( std::string image_name, std::string detection_name);
+
 int main(int argc, char **argv)
 {   
     if(argc != 6)
@@ -68,7 +71,7 @@ int main(int argc, char **argv)
     // Main loop
     cv::Mat imRGB, imD;
     assert(nImages==DetectResults.size());
-
+     int ti=0;
     for(int ni=0; ni<nImages; ni++)
     {  
         // Read image and depthmap from file
@@ -90,9 +93,36 @@ int main(int argc, char **argv)
 #endif
          
         // Pass the image to the SLAM system
-        ORB_SLAM2::DetectResult detect =DetectResults[ni];
-        SLAM.TrackRGBD(imRGB,imD,tframe,detect);
+        ORB_SLAM2::DetectResult detect =DetectResults[ti];
+        ti++;
+        string args=argv[3];
+        string tmp=args+"/"+vstrImageFilenamesRGB[ni];
+        bool aligned;
+        
+        while(1)
+        {   
 
+            if(matchDetection(tmp,detect.image_name))
+            {
+                break;
+            }
+            else
+            {
+                detect =DetectResults[ti];
+                ti++;
+            }
+
+        }
+        
+        SLAM.TrackRGBD(imRGB,imD,tframe,detect);
+         
+        /*
+        std::cout<<"######trackdebug######"<<std::endl;
+        std::cout<<vstrImageFilenamesRGB[ni]<<std::endl;
+        std::cout<<detect.image_name<<std::endl;
+        detect.print_detect();
+        std::cout<<"######trackdebug######"<<std::endl;
+        */
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
@@ -134,6 +164,22 @@ int main(int argc, char **argv)
 
     return 0;
 }
+/*aligned*/
+bool matchDetection( std::string image_name, std::string detection_name) {
+    
+        if (detection_name == image_name) 
+            {
+                return true;
+            }
+        else
+           {
+              return false;
+           }
+    
+    // 如果没有匹配的检测结果，则返回 false
+    
+}
+
 void LoadDetection(const std::string& filename, std::vector<ORB_SLAM2::DetectResult> &DetectResults)
 {
    std::ifstream file(filename);

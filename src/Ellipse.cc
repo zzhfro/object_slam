@@ -60,7 +60,7 @@ Ellipse::Ellipse(const Eigen::Matrix3d& C_)
            Eigen::Vector2d tmp=C.block<2,1>(0,2);
             
            center=-RuRT.inverse()*tmp;
-           std::cout<<R<<std::endl;
+           
            
 
 

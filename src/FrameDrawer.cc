@@ -20,7 +20,7 @@
 
 #include "FrameDrawer.h"
 #include "Tracking.h"
-
+#include "BoundingBox.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
@@ -125,9 +125,32 @@ cv::Mat FrameDrawer::DrawFrame()
     return imWithInfo;
 }
 
-cv::Mat FrameDrawer::DrawDetect()
-{
+cv::Mat FrameDrawer::DrawDetect(cv::Mat &img)
+{ 
+  std::vector<BoundingBox> boxes;
+  {
+    unique_lock<mutex> lock(mMutex);
+    boxes=boxes_drawer;
+  }
+  for(int i=0;i<boxes.size();++i)
+  {
+    cv::Scalar color;
+    BoundingBox box=boxes[i];
+    cv::rectangle(img, cv::Point2i(box.x-box.w/2, box.y-box.h/2),
+                           cv::Point2i(box.x+box.w/2, box.y+box.h/2),
+                           color,
+                           1);
+       {
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(2) << box.ObjectConf;
+            // cv::putText(img, std::to_string(d.id) + "(" + std::to_string(d.category_id) + ") | " + ss.str(),
+            cv::putText(img,  ss.str() + "|" + std::to_string(box.ObjectCategory),
+                        cv::Point2i(box.x-box.w/2-10, box.y-box.h/2-5), cv::FONT_HERSHEY_DUPLEX,
+                        0.55, cv::Scalar(255, 255, 255), 1, false);
+        }                       
 
+  }
+  return img;
 }
 void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText)
 {
@@ -201,7 +224,7 @@ void FrameDrawer::Update(Tracking *pTracker)
         }
     }
     mState=static_cast<int>(pTracker->mLastProcessedState);
-
+    boxes_drawer=pTracker->track_detect->ObjectBoxes;
     
 }
 

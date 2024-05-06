@@ -137,9 +137,16 @@ void Viewer::Run()
             mpMapDrawer->DrawMapObjects();    
 
         pangolin::FinishFrame();
-
+      
         cv::Mat im = mpFrameDrawer->DrawFrame();
-        cv::imshow("ORB-SLAM2: Current Frame",im);
+        
+        if (menuShowObjects)
+        {
+           mpFrameDrawer->DrawDetect(im);
+        } 
+        
+         cv::imshow("ORB-SLAM2: Current Frame",im);
+       
         cv::waitKey(mT);
 
         if(menuReset)
