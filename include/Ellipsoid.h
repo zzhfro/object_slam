@@ -68,9 +68,9 @@ namespace ORB_SLAM2
    }
 
    static std::pair<bool, Ellipsoid>
-   reconstruct_ellipsoid_from_center(const std::vector<BoundingBox, Eigen::aligned_allocator<BoundingBox>>& bboxes,
-                            const std::vector<Eigen::Matrix<double,3,4>, Eigen::aligned_allocator<Eigen::Matrix<double,3,4>>>& Rts, 
-                            const Eigen::Matrix3d& K);
+   reconstruct_ellipsoid_from_center( std::vector<BoundingBox>& bboxes,
+                             std::vector<Eigen::Matrix<double,3,4>>& Rts, 
+                             Eigen::Matrix3d& K);
     public:
         Eigen::Matrix4d Q;
         Eigen::Vector3d axes=Eigen::Vector3d(-1,-1,-1);

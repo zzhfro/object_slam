@@ -96,9 +96,9 @@ Eigen::Vector3d TriangulatePoints(const std::vector<Eigen::Vector2d, Eigen::alig
 }
 
 std::pair<bool, Ellipsoid>
-   Ellipsoid::reconstruct_ellipsoid_from_center(const std::vector<BoundingBox, Eigen::aligned_allocator<BoundingBox>>& boxes,
-                            const std::vector<Eigen::Matrix<double,3,4>, Eigen::aligned_allocator<Eigen::Matrix<double,3,4>>>& Rts, 
-                            const Eigen::Matrix3d& K)
+   Ellipsoid::reconstruct_ellipsoid_from_center(std::vector<BoundingBox>& boxes,
+                             std::vector<Eigen::Matrix<double,3,4>>& Rts, 
+                             Eigen::Matrix3d& K)
    { 
     /**
      * r=1/n*(sum(w/fx+h/fy)*0.5)

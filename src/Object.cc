@@ -140,8 +140,18 @@ namespace ORB_SLAM2
         //only above 10 thne begin restruct
         return false;
      }
-     
+     Eigen::Matrix3d K;
+     cv::cv2eigen(tracker->GetK(), K);
+     auto [status_reconstruct, ellipsoid_tmp] = Ellipsoid::reconstruct_ellipsoid_from_center(box_observed, Rts, K);
+     if(!status_reconstruct)
+     {
+        return false;
 
+     }
+
+     ellipsoid=ellipsoid_tmp;
+     if (status == ObjectTrackStatus::ONLY_2D)
+        status = ObjectTrackStatus::INITIALIZED;
 
   }
 
