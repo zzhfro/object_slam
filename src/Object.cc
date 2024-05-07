@@ -3,6 +3,17 @@
 #include <opencv2/core/eigen.hpp>
 #include <Eigen/Dense>
 #include "Tracking.h"
+#include "Optimizer.h"
+#include "Thirdparty/g2o/g2o/core/base_vertex.h"
+#include "Thirdparty/g2o/g2o/core/base_unary_edge.h"
+#include "Thirdparty/g2o/g2o/core/sparse_optimizer.h"
+#include "Thirdparty/g2o/g2o/core/block_solver.h"
+#include "Thirdparty/g2o/g2o/core/solver.h"
+#include "Thirdparty/g2o/g2o/core/optimization_algorithm_levenberg.h"
+#include "Thirdparty/g2o/g2o/solvers/linear_solver_dense.h"
+#include "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
+#include "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
+#include "ObjectOptimizer.h"
 namespace ORB_SLAM2
 {
   #define TO_RAD(x) 0.01745329251 * (x)
@@ -107,7 +118,7 @@ namespace ORB_SLAM2
   
 
   }
-
+  
   bool Object::restruct_from_center()
   {
      if(this->get_angled_difference()<TO_RAD(10.0))
@@ -131,7 +142,72 @@ namespace ORB_SLAM2
 
   }
 
+  void Object::optimize_reconstruction()
+  {  
+     {
+      unique_lock<mutex> lock(mutex_status);
+      if(status!=ObjectTrackStatus::INITIALIZED)
+      {
+         std::cout<<"the object should be initialized before optimized"<<std::endl;
+         return;
+      }
+     }
+     Ellipsoid ell=get_ellipsoid();
+     Eigen::Matrix3d K;
+     cv::cv2eigen(tracker->GetK(), K);
 
+     typedef g2o::BlockSolver<g2o::BlockSolverTraits<6, 1>> BlockSolver_6_1;
+     BlockSolver_6_1::LinearSolverType *linear_solver = new g2o::LinearSolverDense<BlockSolver_6_1::PoseMatrixType>();
+
+
+    auto solver = new g2o::OptimizationAlgorithmLevenberg(
+        new BlockSolver_6_1(linear_solver)
+    );
+     g2o::SparseOptimizer optimizer;     // 图模型
+     optimizer.setAlgorithm(solver);   // 设置求解器
+     optimizer.setVerbose(false);       // 关闭调试输出
+
+     VertexEllipsoidNoRotate*  v=new VertexEllipsoidNoRotate();
+     Eigen::Matrix<double, 6, 1> e;
+     e << ell.get_axes(), ell.get_center();
+     v->setEstimate(e);
+     v->setId(0);
+     optimizer.addVertex(v);
+    std::vector<BoundingBox>boxes_;
+    std::vector<double>confs_;
+    std::vector<Eigen::Matrix<double,3,4>> Rts_;
+     //add edge
+     {
+         unique_lock<mutex> lock(mutex_add_detection);
+         boxes_=box_observed;
+         confs_=confs;
+         Rts_=Rts;
+     }
+     for(int i=0;i<boxes_.size();++i)
+     {
+         Eigen::Matrix<double, 3, 4> P = K * Rts_[i];
+         BoundingBox box=boxes_[i];
+         EdgeEllipsoidProjection *edge = new EdgeEllipsoidProjection(P, Ellipse::compute_ellipse(box), ell.get_R());
+         edge->setId(i);
+         edge->setVertex(0, v);
+         Eigen::Matrix<double, 1, 1> information_matrix = Eigen::Matrix<double, 1, 1>::Identity();
+         information_matrix *=confs_[i] ;
+         edge->setInformation(information_matrix);
+         optimizer.addEdge(edge);
+     }
+
+         optimizer.initializeOptimization();
+         optimizer.optimize(8);
+         Eigen::Matrix<double, 6, 1> ellipsoid_estimate = v->estimate();
+         
+         Ellipsoid new_ellipsoid(ellipsoid_estimate.head(3), Eigen::Matrix3d::Identity(), ellipsoid_estimate.tail(3));
+         std::cout<<"###DEBUG###"<<std::endl;
+         std::cout<<ell.get_axes()-new_ellipsoid.get_axes()<<std::endl;
+         std::cout<<"###DEBUG###"<<std::endl;
+         this->set_ellipsoid(new_ellipsoid);
+   
+
+  }
 
 
 

@@ -2,6 +2,7 @@
 #define DISTANCE_H
 #include "Ellipse.h"
 #include <Eigen/Dense>
+#include <unsupported/Eigen/MatrixFunctions>
 namespace ORB_SLAM2{
 
 

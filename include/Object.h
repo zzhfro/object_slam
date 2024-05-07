@@ -41,20 +41,29 @@ public:
 
    void insert_Map(Map *pmap);
    
+   void optimize_reconstruction();
    double get_angled_difference();
    
   
    
    ObjectTrackStatus get_status()
    {
+    std::unique_lock<std::mutex> lock(mutex_status);
     return status;
    }
    
    Ellipsoid get_ellipsoid()
    {
+    std::unique_lock<std::mutex> lock(mutex_ellipsoid);
     return ellipsoid;
    }
+   
+   void set_ellipsoid(const Ellipsoid& ell)
+   {
+     std::unique_lock<std::mutex> lock(mutex_ellipsoid);
+     ellipsoid=ell;
 
+   }
    int get_category_id()
    {
     return category_id;
@@ -103,6 +112,7 @@ public:
    std::mutex mutex_ellipsoid;
    Ellipsoid ellipsoid;
 
+   std::mutex mutex_status;
    ObjectTrackStatus status = ObjectTrackStatus::ONLY_2D;
    
    Tracking* tracker=nullptr; 

@@ -71,6 +71,7 @@
   "valarray": "cpp",
   "core": "cpp",
   "specialfunctions": "cpp",
-  "*.ipp": "cpp"
+  "*.ipp": "cpp",
+  "matrixfunctions": "cpp"
  }
 }

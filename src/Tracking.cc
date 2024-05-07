@@ -447,15 +447,6 @@ if (mState == Tracking::OK)
             
             }
             assignment = dlib::max_cost_assignment(cost); // solve
-            std::cout<<"cost in dlib"<<std::endl;
-            std::cout<<cost<<std::endl;
-            std::cout<<"#########"<<std::endl;
-            std::cout<<"assiagnment"<<std::endl;
-            for(int i=0;i<assignment.size();++i)
-            {
-                std::cout<<assignment[i]<<"  ";
-            }
-         
          }
 
          /**
@@ -470,7 +461,6 @@ if (mState == Tracking::OK)
             //if new objects
             if (assigned_track_idx >= static_cast<long>(possible_tracks.size()) || cost(di, assigned_track_idx) == 0) 
             {
-                std::cout<<"success"<<std::endl;
                  auto tr=Object::creat_new_object(det.ObjectCategory,det,Rt,current_frame_id,this,kf);
                  objects_track.push_back(tr);            
             } 
@@ -496,7 +486,10 @@ if (mState == Tracking::OK)
                     ||(tr->get_obs_num() % 2 == 0 && tr->get_status() == ObjectTrackStatus::INITIALIZED)) 
                     {   
                         bool status_rec=tr->restruct_from_center();
-                        
+                        if(status_rec)
+                        {
+                          tr->optimize_reconstruction();
+                        }
                     }
               }
             }
