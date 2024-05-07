@@ -41,31 +41,6 @@ namespace ORB_SLAM2
       new_obj->box_observed_kf[kf]=box;
      }
 
-     cv::Scalar col(0, 0, 0);
-    if (new_obj->category_id == 56) 
-    { 
-       col = cv::Scalar(255, 245, 5);
-        
-    } else if (new_obj->category_id == 26 || new_obj->category_id == 24) { // bag
-        col = cv::Scalar(184, 216, 176);
-    } else if (new_obj->category_id == 62) { 
-        col = cv::Scalar(6, 191, 0);
-    } else if (new_obj->category_id == 77) { 
-        col = cv::Scalar(173, 105, 42);
-    } else if (new_obj->category_id == 64) { 
-        col = cv::Scalar(144, 0, 255);
-    } else if (new_obj->category_id == 66) { 
-        col = cv::Scalar(0, 110, 255);
-    } else if (new_obj->category_id == 41) { // cup
-        col = cv::Scalar(255, 0, 0);
-    } else if (new_obj->category_id == 39) { // bottle
-        col = cv::Scalar(63, 194, 177);
-    } else if (new_obj->category_id == 67) { // phone
-        col = cv::Scalar(255, 153, 0);
-    }
-    cv::Scalar bgr(col[2], col[1], col[0]);
-     if (!(col[0] == 0 && col[1] == 0 && col[2] == 0))
-        new_obj->color =  bgr;
      new_obj->tracker = track;
      new_obj->status = ObjectTrackStatus::ONLY_2D;   
      

@@ -80,28 +80,30 @@ public:
         return associated_map_points;
     }
    bool restruct_from_center();
-   Ellipsoid ellipsoid;
+   
    int category_id;
    int object_id;
    double uncertainty = 0.0;
    static unsigned int object_factory_id;
-   cv::Scalar color; //color is bounding to the category_id
-   std::vector<BoundingBox> box_observed; //store the box observe the object
+
    std::vector<int> frame_ids; //the correspondingframe
    std::vector<Eigen::Matrix<double,3,4>> Rts;
-
-   std::vector<double> confs;
    
    std::unordered_map<KeyFrame*,double> keyframe_confs;
    std::unordered_map<KeyFrame*,BoundingBox> box_observed_kf;
    //std::unordered_map<MapPoint*, int> associated_map_points_;
+
+   std::mutex mutex_add_detection;
+   std::vector<double> confs;
+   std::vector<BoundingBox> box_observed; //store the box observe the object
    
    std::mutex mutex_associated_map_points;
    std::unordered_map<MapPoint*, int> associated_map_points;
+   
+   std::mutex mutex_ellipsoid;
+   Ellipsoid ellipsoid;
 
    ObjectTrackStatus status = ObjectTrackStatus::ONLY_2D;
-   
-   std::mutex mutex_add_detection;
    
    Tracking* tracker=nullptr; 
 };

@@ -78,5 +78,15 @@ BoundingBox Ellipse::compute_box()
         BoundingBox box(center[0],center[1],xmax*2,ymax*2,-1,-1.0);
         return box;
 }         
-
+std::pair<Eigen::Vector2d, Eigen::Matrix2d> Ellipse::GetGAussian()const
+{
+     Eigen::Matrix2d A_dual;
+        A_dual << std::pow(axes[0], 2), 0.0,
+                  0.0, std::pow(axes[1], 2);
+        Eigen::Matrix2d R;
+        R << std::cos(angle), -std::sin(angle),
+             std::sin(angle), std::cos(angle);
+        Eigen::Matrix2d cov = R * A_dual * R.transpose();
+        return {center, cov};
+}
 };

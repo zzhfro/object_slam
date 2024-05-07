@@ -40,7 +40,8 @@ namespace ORB_SLAM2
         {
           return center;
         }
-
+        
+        std::pair<Eigen::Vector2d, Eigen::Matrix2d> GetGAussian() const;
            
     public:
         Eigen::Matrix3d C; //primal
