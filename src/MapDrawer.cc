@@ -39,7 +39,7 @@ MapDrawer::MapDrawer(Map* pMap, const string &strSettingPath):mpMap(pMap)
     mPointSize = fSettings["Viewer.PointSize"];
     mCameraSize = fSettings["Viewer.CameraSize"];
     mCameraLineWidth = fSettings["Viewer.CameraLineWidth"];
-
+    object_color_manager=ObjectColorManager(80,"/home/zzhfro/code/object_slam/ORB_SLAM2/Examples/RGB-D/obj.txt");
 }
 
 void MapDrawer::DrawMapPoints()
@@ -84,63 +84,72 @@ void MapDrawer::DrawMapObjects() {
     std::vector<Object*> objects = mpMap->GetAllObjects();
     glPointSize(mPointSize);
     glLineWidth(2);
+    
 
     for (const auto& object : objects) { 
-        glColor3f(static_cast<double>(object->color[2]) / 255,
-                  static_cast<double>(object->color[1]) / 255,
-                  static_cast<double>(object->color[0]) / 255);
+       
+        if(object->category_id!=0) 
+        {  auto info = object_color_manager.getObjectInfo(object->category_id);
+           cv::Scalar color = info.first;
+           std::string name = info.second;
+           glColor3f(static_cast<double>(color[2]) / 255,
+                     static_cast<double>(color[1]) / 255,
+                     static_cast<double>(color[0]) / 255);
 
-        Ellipsoid& ell = object->ellipsoid;
-        if (!display_3d_bbox_) 
-        {
-            auto pts = ell.generate_point_cloud(50);
-            int i = 0;
-            while (i < pts.rows()) {
-                glBegin(GL_LINE_STRIP);
-                // glColor3f(0.0, 1.0, 0.0);
-                // glBegin(GL_POINTS);
-                for (int k = 0; k < 50; ++k, ++i){
-                    glVertex3f(pts(i, 0), pts(i, 1), pts(i, 2));
+           Ellipsoid& ell = object->ellipsoid;
+
+            if (!display_3d_bbox_) 
+            {
+                auto pts = ell.generate_point_cloud(50);
+                int i = 0;
+                while (i < pts.rows()) {
+                    glBegin(GL_LINE_STRIP);
+                    // glColor3f(0.0, 1.0, 0.0);
+                    // glBegin(GL_POINTS);
+                    for (int k = 0; k < 50; ++k, ++i){
+                        glVertex3f(pts(i, 0), pts(i, 1), pts(i, 2));
+                    }
+                    glEnd();
                 }
+                
+            } 
+            else 
+            {
+                Eigen::Vector3d center = ell.get_center();
+                Eigen::Vector3d axes = ell.get_axes();
+                Eigen::Matrix3d R = ell.get_R();
+                Eigen::Matrix<double, 8, 3> pts;
+                pts << -axes[0], -axes[1], -axes[2],
+                        axes[0], -axes[1], -axes[2],
+                        axes[0],  axes[1], -axes[2],
+                    -axes[0],  axes[1], -axes[2],
+                    -axes[0], -axes[1],  axes[2],
+                        axes[0], -axes[1],  axes[2],
+                        axes[0],  axes[1],  axes[2],
+                    -axes[0],  axes[1],  axes[2];
+                Eigen::Matrix<double, 8, 3> obb = (R * pts.transpose()).transpose();
+                obb.rowwise() += center.transpose();
+
+                glBegin(GL_LINE_STRIP);
+                glVertex3f(obb(0, 0), obb(0, 1), obb(0, 2));
+                glVertex3f(obb(1, 0), obb(1, 1), obb(1, 2));
+                glVertex3f(obb(2, 0), obb(2, 1), obb(2, 2));
+                glVertex3f(obb(3, 0), obb(3, 1), obb(3, 2));
+                glVertex3f(obb(0, 0), obb(0, 1), obb(0, 2));
+                glVertex3f(obb(4, 0), obb(4, 1), obb(4, 2));
+                glVertex3f(obb(5, 0), obb(5, 1), obb(5, 2));
+                glVertex3f(obb(1, 0), obb(1, 1), obb(1, 2));
+                glVertex3f(obb(5, 0), obb(5, 1), obb(5, 2));
+                glVertex3f(obb(6, 0), obb(6, 1), obb(6, 2));
+                glVertex3f(obb(2, 0), obb(2, 1), obb(2, 2));
+                glVertex3f(obb(6, 0), obb(6, 1), obb(6, 2));
+                glVertex3f(obb(7, 0), obb(7, 1), obb(7, 2));
+                glVertex3f(obb(3, 0), obb(3, 1), obb(3, 2));
+                glVertex3f(obb(7, 0), obb(7, 1), obb(7, 2));
+                glVertex3f(obb(4, 0), obb(4, 1), obb(4, 2));
                 glEnd();
             }
-        } 
-        else 
-        {
-            Eigen::Vector3d center = ell.get_center();
-            Eigen::Vector3d axes = ell.get_axes();
-            Eigen::Matrix3d R = ell.get_R();
-            Eigen::Matrix<double, 8, 3> pts;
-            pts << -axes[0], -axes[1], -axes[2],
-                    axes[0], -axes[1], -axes[2],
-                    axes[0],  axes[1], -axes[2],
-                   -axes[0],  axes[1], -axes[2],
-                   -axes[0], -axes[1],  axes[2],
-                    axes[0], -axes[1],  axes[2],
-                    axes[0],  axes[1],  axes[2],
-                   -axes[0],  axes[1],  axes[2];
-            Eigen::Matrix<double, 8, 3> obb = (R * pts.transpose()).transpose();
-            obb.rowwise() += center.transpose();
-
-            glBegin(GL_LINE_STRIP);
-            glVertex3f(obb(0, 0), obb(0, 1), obb(0, 2));
-            glVertex3f(obb(1, 0), obb(1, 1), obb(1, 2));
-            glVertex3f(obb(2, 0), obb(2, 1), obb(2, 2));
-            glVertex3f(obb(3, 0), obb(3, 1), obb(3, 2));
-            glVertex3f(obb(0, 0), obb(0, 1), obb(0, 2));
-            glVertex3f(obb(4, 0), obb(4, 1), obb(4, 2));
-            glVertex3f(obb(5, 0), obb(5, 1), obb(5, 2));
-            glVertex3f(obb(1, 0), obb(1, 1), obb(1, 2));
-            glVertex3f(obb(5, 0), obb(5, 1), obb(5, 2));
-            glVertex3f(obb(6, 0), obb(6, 1), obb(6, 2));
-            glVertex3f(obb(2, 0), obb(2, 1), obb(2, 2));
-            glVertex3f(obb(6, 0), obb(6, 1), obb(6, 2));
-            glVertex3f(obb(7, 0), obb(7, 1), obb(7, 2));
-            glVertex3f(obb(3, 0), obb(3, 1), obb(3, 2));
-            glVertex3f(obb(7, 0), obb(7, 1), obb(7, 2));
-            glVertex3f(obb(4, 0), obb(4, 1), obb(4, 2));
-            glEnd();
-        }
+       }
     }
 }
 

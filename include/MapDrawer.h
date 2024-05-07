@@ -25,6 +25,7 @@
 #include"MapPoint.h"
 #include"KeyFrame.h"
 #include<pangolin/pangolin.h>
+#include "ObjectColorManager.h"
 #include"Object.h"
 #include<mutex>
 
@@ -49,6 +50,7 @@ public:
 private:
 
     float mKeyFrameSize;
+    ObjectColorManager object_color_manager;
     float mKeyFrameLineWidth;
     float mGraphLineWidth;
     float mPointSize;

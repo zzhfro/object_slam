@@ -12,6 +12,7 @@
 #include <mutex>
 #include "Frame.h"
 #include <Eigen/Dense>
+#include "ObjectColorManager.h"
 
 namespace ORB_SLAM2
 {
@@ -99,7 +100,7 @@ public:
    std::unordered_map<MapPoint*, int> associated_map_points;
 
    ObjectTrackStatus status = ObjectTrackStatus::ONLY_2D;
-
+   
    std::mutex mutex_add_detection;
    
    Tracking* tracker=nullptr; 
