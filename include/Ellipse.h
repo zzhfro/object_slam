@@ -9,19 +9,15 @@ namespace ORB_SLAM2
   { 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     public:
-        Ellipse()
-        {
-          C=Eigen::Matrix3d::Identity();
-          C(2, 2) = -1;
-        }
+        Ellipse();
         
         Ellipse(const Eigen::Matrix3d& C_) ;
+
+        Ellipse(const Eigen::Vector2d& axes,double angle, const Eigen::Vector2d& center);
         
         BoundingBox compute_box();
 
         static Ellipse compute_ellipse(BoundingBox box,double angle=0); 
-        
-        Ellipse(const Eigen::Vector2d& axes,double angle, const Eigen::Vector2d& center);
 
         Eigen::Matrix3d get_C()
         {

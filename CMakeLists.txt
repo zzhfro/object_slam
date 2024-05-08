@@ -83,6 +83,10 @@ add_executable(test_color_manager
 Examples/RGB-D/test_color_manager.cc)
 target_link_libraries(test_color_manager ${PROJECT_NAME})
 
+add_executable(test_ellipsoid
+Examples/RGB-D/test_ellipsoid.cc)
+target_link_libraries(test_ellipsoid ${PROJECT_NAME})
+
 
 
 

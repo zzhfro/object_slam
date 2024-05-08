@@ -4,22 +4,26 @@
 #include <math.h>
 namespace ORB_SLAM2
 {
+Ellipse::Ellipse()
+        {
+          C=Eigen::Matrix3d::Identity();
+          C(2, 2) = -1;
+        }    
 Ellipse::Ellipse(const Eigen::Vector2d& axes_,double angle_, const Eigen::Vector2d& center_)
           //counterclockwise if angle >0
          {
-          Eigen::Matrix3d Two;
-          Eigen::Matrix3d C_center = Eigen::Matrix3d(Eigen::Vector3d(1/std::pow(axes_[0], 2), 
-                                                                 1/std::pow(axes_[1], 2),
-                                                                 -1.0).asDiagonal());
-          Two << std::cos(angle_), -std::sin(angle_), center_[0],
-                std::sin(angle_),  std::cos(angle_), center_[1],
-                0.0, 0.0, 1.0;
-          
-          Eigen::Matrix3d Two_inverse=Two.inverse();
-          C=Two_inverse.transpose()*C_center*Two_inverse;
-         
-          C = 0.5 * (C + C.transpose());
-          C /= -C(2, 2);
+          Eigen::Matrix3d A;
+        A << 1.0 / std::pow(axes_[0], 2), 0.0, 0.0,
+            0.0, 1.0 / std::pow(axes_[1], 2), 0.0,
+            0.0, 0.0, -1.0;
+        Eigen::Matrix3d R;
+        R << std::cos(angle_), -std::sin(angle_), 0.0,
+            std::sin(angle_), std::cos(angle_), 0.0,
+            0.0, 0.0, 1.0;
+        Eigen::Matrix3d T = Eigen::Matrix3d::Identity();
+        T(0, 2) = -center_[0];
+        T(1, 2) = -center_[1];
+          C = T.transpose() * R * A * R.transpose() * T;
           
           this->axes= axes_;
           this->angle = angle_;
@@ -28,43 +32,39 @@ Ellipse::Ellipse(const Eigen::Vector2d& axes_,double angle_, const Eigen::Vector
          }
 Ellipse::Ellipse(const Eigen::Matrix3d& C_) 
          {
-            if ((C.transpose() - C).cwiseAbs().sum() > 1e-3) 
-            {
-                std::cout << "Warning: Matrix should be symmetric" << "\n";
-            }
-            C= C_;
+            C= 0.5 * (C_ + C_.transpose());
             C/= -C(2, 2);
             
-            /*  RuRT -RuRTt
-            *   -tTRuRT tTRuRTt-1  
-            *   
-            */
-           Eigen::Matrix2d RuRT=C.block<2,2>(0,0);
-           Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> eigensolver(RuRT);
-           if (eigensolver.info() != Eigen::Success) 
-           {
-               std::cerr << "Eigen decomposition failed!" << std::endl;
-               return;
-           }
-           Eigen::Matrix2d Q = eigensolver.eigenvectors(); // 旋转矩阵
-           Eigen::Vector2d lambda = eigensolver.eigenvalues(); // 特征值
-
-           std::sort(lambda.data(), lambda.data() + lambda.size());
-           Eigen::Matrix2d U = Eigen::DiagonalMatrix<double, 2>(lambda);
-           axes[0]=std::sqrt(1/U(0,0));
-           axes[1]=std::sqrt(1/U(1,1));
-              
-           Eigen::Matrix2d R=Q;   
-           
-           angle = std::atan(R(1,0)/R(0,0));
-           Eigen::Vector2d tmp=C.block<2,1>(0,2);
+            Eigen::Matrix3d C_star=C.inverse();
+            C_star/=-C_star(2,2);
+            center = -C_star.col(2).head(2);
+            Eigen::Matrix3d T_c = Eigen::Matrix3d::Identity();
+            T_c(0, 2) = -center[0];
+            T_c(1, 2) = -center[1];
+            Eigen::Matrix3d temp = T_c * C_star * T_c.transpose();
+            Eigen::Matrix3d C_center = 0.5 * (temp + temp.transpose());
             
-           center=-RuRT.inverse()*tmp;
-           
-           
+            Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> eigen_solver(C_center.block<2, 2>(0, 0));
+            Eigen::Matrix2d eig_vectors = eigen_solver.eigenvectors();
+            Eigen::Vector2d eig_values = eigen_solver.eigenvalues();
+            
+            if(eig_values[0]<eig_values[1])
+            {   double tmp=eig_values[1];
+                eig_values[1]=eig_values[0];
+                eig_values[0]=tmp;
 
+                eig_vectors.col(0).swap(eig_vectors.col(1));
+            }
+            if (eig_vectors.determinant() < 0.0) {
+                eig_vectors.col(1) *= -1;
+            }
+            if (eig_vectors(0, 0) < 0) {    // force first axis to be positive in x
+                eig_vectors *= -1.0;
+            }
 
-        
+            axes = eig_values.cwiseAbs().cwiseSqrt();
+            angle = std::atan2(eig_vectors(1, 0), eig_vectors(0, 0));
+           
          }
 BoundingBox Ellipse::compute_box() 
 {

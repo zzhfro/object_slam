@@ -6,21 +6,92 @@
 #define TO_DEG(x) 57.2957795131 * (x)
 namespace ORB_SLAM2{
 
+Ellipsoid::Ellipsoid(const Eigen::Matrix4d& Q_)
+{    
+     Q=0.5 * (Q_ + Q_.transpose());
+     Q /= -Q(3, 3);
+
+     Eigen::Matrix4d Q_star=Q.inverse();
+     Q_star/=-Q_star(3,3);
+
+     center = -Q_star.col(3).head(3);
+
+    Eigen::Matrix4d T_c = Eigen::Matrix4d::Identity();
+    T_c(0, 3) = -center[0];
+    T_c(1, 3) = -center[1];
+    T_c(2, 3) = -center[2];
+    Eigen::Matrix4d temp = T_c *Q_star * T_c.transpose();
+    Eigen::Matrix4d Q_center = 0.5 * (temp + temp.transpose());
+
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eigen_solver(Q_center.block<3, 3>(0, 0));
+    Eigen::Matrix3d eig_vectors = eigen_solver.eigenvectors();
+    Eigen::Vector3d eig_values = eigen_solver.eigenvalues();
+    
+
+    /**
+     * 
+     * sort the values and vectors
+    */
+
+    if(eig_values[0]<eig_values[1])
+    {
+        double tmp=eig_values[1];
+        eig_values[1]=eig_values[0];
+        eig_values[0]=tmp;
+        eig_vectors.col(0).swap(eig_vectors.col(1)); 
+    }
+    if(eig_values[0]<eig_values[2])
+    {
+        double tmp=eig_values[2];
+        eig_values[2]=eig_values[0];
+        eig_values[0]=tmp;
+        eig_vectors.col(0).swap(eig_vectors.col(2)); 
+    }
+    if(eig_values[1]<eig_values[2])
+    {
+        double tmp=eig_values[2];
+        eig_values[2]=eig_values[1];
+        eig_values[1]=tmp;
+        eig_vectors.col(1).swap(eig_vectors.col(2)); 
+    }
+    if (eig_vectors.determinant() < 0.0) {
+                eig_vectors.col(2) *= -1;
+            }
+    if (eig_vectors(0, 0) < 0) {    // force first axis to be positive in x
+        eig_vectors *= -1.0;
+    }
+
+    
+    axes = eig_values.cwiseAbs().cwiseSqrt();
+    R = eig_vectors;
+
+
+
+
+}
 Ellipsoid::Ellipsoid(const Eigen::Vector3d& axes,const Eigen::Matrix3d& R,const Eigen::Vector3d& center)
 {
 
-          Eigen::Matrix4d Two=Eigen::Matrix4d::Identity();
-    
-          Eigen::Matrix4d Q_star = Eigen::Matrix4d(Eigen::Vector4d(1/std::pow(axes[0], 2), 
-                                                                 1/std::pow(axes[1], 2),
-                                                                 1/std::pow(axes[2], 2),
-                                                                 -1.0).asDiagonal());
-          Two.block<3, 3>(0, 0) = R;
-          Two.block<3, 1>(0,3)=center;
-          Eigen::Matrix4d Two_inverse=Two.inverse();
-          Q=Two_inverse.transpose()*Q_star*Two_inverse;
-          Q = 0.5 * (Q_star + Q_star.transpose());
-          Q /= -Q(3, 3);
+          Eigen::Matrix4d Q_star = Eigen::Matrix4d(Eigen::Vector4d(std::pow(axes[0], 2),
+                                                                std::pow(axes[1], 2),
+                                                                std::pow(axes[2], 2),
+                                                                -1.0).asDiagonal());
+          Eigen::Matrix4d T_center = Eigen::Matrix4d::Identity();
+          T_center(0, 3) = center[0];
+          T_center(1, 3) = center[1];
+          T_center(2, 3) = center[2];
+          Eigen::Matrix4d Rw_e = Eigen::Matrix4d::Identity();
+          Rw_e.block<3, 3>(0, 0) = R;
+
+          Eigen::Matrix4d transf = T_center * Rw_e;
+          Q_star = transf * Q_star * transf.transpose();
+
+          Eigen::Matrix4d Q_ = 0.5 * (Q_star + Q_star.transpose());
+          Q_ /= -Q_(3, 3);
+
+          Q=Q_.inverse();
+          Q/=-Q(3,3);
+
 
           this->axes= axes;
           this->R = R;

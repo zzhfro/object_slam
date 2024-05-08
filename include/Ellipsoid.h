@@ -17,15 +17,7 @@ namespace ORB_SLAM2
         Q(3, 3) = -1;
         
     }
-    Ellipsoid(const Eigen::Matrix4d& Q_) {
-        if ((Q_.transpose() - Q_).cwiseAbs().sum() > 1e-3) {
-            std::cout << "Warning: Matrix should be symmetric" << "\n";
-        }
-        //in fact this function isn't completion but it doesn't effect the use
-        Q = Q_;
-        Q /= -Q(3, 3);
-        
-    }
+    Ellipsoid(const Eigen::Matrix4d& Q_);
     Ellipsoid(const Eigen::Vector3d& axes,const Eigen::Matrix3d& R,const Eigen::Vector3d& center);
      
     void operator= (const Ellipsoid& ell) {
