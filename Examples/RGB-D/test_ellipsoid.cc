@@ -1,10 +1,11 @@
 /**
  * 
  * 
- * to test the porjection of ellipsoid
+ * to test 
 */
 #include "Ellipse.h"
 #include "Ellipsoid.h"
+#include "BoundingBox.h"
 #include <Eigen/Dense>
 #include <iostream>
 int main()
@@ -40,7 +41,7 @@ std::cout<<ell_new.Q<<std::endl;
 
 Eigen::Vector2d axes_ellipse={a,b};
 Eigen::Vector2d center_ellipse={1,3};
-double angle=3.14/3;
+double angle=0;
 
 
 ORB_SLAM2::Ellipse eliipse_init(axes_ellipse,angle,center_ellipse); 
@@ -55,7 +56,19 @@ std::cout<<"C ellipse init"<<std::endl;
 std::cout<<ellipse_new.get_C()<<std::endl;
 
 
-   
+std::cout<<"TEST BOX FROM ELLISPE"<<std::endl;
+ORB_SLAM2::BoundingBox box=eliipse_init.compute_box();
+std::cout<<box.x<<" "<<box.y<<" "<<box.w<<" "<<box.h<<" "<<std::endl;
+
+std::cout<<"TEST ELLISPE FROM  BOX"<<std::endl;
+ORB_SLAM2::Ellipse ell_box=ORB_SLAM2::Ellipse::compute_ellipse(box);
+std::cout<<"from box axes"<<std::endl;
+std::cout<<ell_box.get_axes()<<std::endl;
+std::cout<<"^^^^^^^^^^^^"<<std::endl;
+std::cout<<ell_box.get_center()<<std::endl;
+std::cout<<"^^^^^^^^^^^^"<<std::endl;
+std::cout<<ell_box.get_angle()<<std::endl;
+
 
 
 

@@ -92,7 +92,7 @@ std::pair<Eigen::Vector2d, Eigen::Matrix2d> Ellipse::GetGAussian()const
 
 Ellipse Ellipse::compute_ellipse(BoundingBox box,double angle)
 {  
- Eigen::Vector2d axes_={box.w,box.h};
+ Eigen::Vector2d axes_={box.w/2,box.h/2};
  Eigen::Vector2d center={box.x,box.y};
   
  return Ellipse(axes_,angle, center);

@@ -14,6 +14,7 @@
 #include "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
 #include "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
 #include "ObjectOptimizer.h"
+#include "Distance.h"
 namespace ORB_SLAM2
 {
   #define TO_RAD(x) 0.01745329251 * (x)
@@ -134,8 +135,7 @@ namespace ORB_SLAM2
         return false;
 
      }
-
-     ellipsoid=ellipsoid_tmp;
+    this->set_ellipsoid(ellipsoid_tmp);
      if (status == ObjectTrackStatus::ONLY_2D)
         status = ObjectTrackStatus::INITIALIZED;
      return true;   
@@ -153,8 +153,12 @@ namespace ORB_SLAM2
       }
      }
      Ellipsoid ell=get_ellipsoid();
+     std::cout<<"ell."<<std::endl;
+     std::cout<<ell.get_center()<<std::endl;
+     std::cout<<"ell."<<std::endl;
      Eigen::Matrix3d K;
      cv::cv2eigen(tracker->GetK(), K);
+     
 
      typedef g2o::BlockSolver<g2o::BlockSolverTraits<6, 1>> BlockSolver_6_1;
      BlockSolver_6_1::LinearSolverType *linear_solver = new g2o::LinearSolverDense<BlockSolver_6_1::PoseMatrixType>();
@@ -165,11 +169,17 @@ namespace ORB_SLAM2
     );
      g2o::SparseOptimizer optimizer;     // 图模型
      optimizer.setAlgorithm(solver);   // 设置求解器
-     optimizer.setVerbose(false);       // 关闭调试输出
+     optimizer.setVerbose(true);       // 关闭调试输出
 
      VertexEllipsoidNoRotate*  v=new VertexEllipsoidNoRotate();
      Eigen::Matrix<double, 6, 1> e;
+     
      e << ell.get_axes(), ell.get_center();
+     /*
+     std::cout<<"#####DEBUG in e####"<<std::endl;
+     std::cout<<e<<std::endl;
+     std::cout<<"#####DEBUG in e####"<<std::endl;
+     */
      v->setEstimate(e);
      v->setId(0);
      optimizer.addVertex(v);
@@ -187,6 +197,11 @@ namespace ORB_SLAM2
      {
          Eigen::Matrix<double, 3, 4> P = K * Rts_[i];
          BoundingBox box=boxes_[i];
+         /*
+         std::cout<<"size debug"<<std::endl;
+         std::cout<<boxes_.size()<<std::endl;
+         std::cout<<"size debug"<<std::endl;
+         */
          EdgeEllipsoidProjection *edge = new EdgeEllipsoidProjection(P, Ellipse::compute_ellipse(box), ell.get_R());
          edge->setId(i);
          edge->setVertex(0, v);
@@ -194,16 +209,37 @@ namespace ORB_SLAM2
          information_matrix *=confs_[i] ;
          edge->setInformation(information_matrix);
          optimizer.addEdge(edge);
-     }
-
+     }   
+         /*
+         std::cout<<"^^^^^PROJECTTION DEBUG^^^^"<<std::endl;
+         Eigen::Matrix<double, 3, 4> P = K * Rts_[1];
+         Ellipse ell_proj=ell.project(P );
+         Ellipse ell_compute_from_box=Ellipse::compute_ellipse(boxes_[1]);
+         std::cout<<"ell_proj info"<<std::endl;
+         std::cout<<ell_proj.get_axes()<<std::endl;
+         std::cout<<ell_proj.get_center()<<std::endl;
+         std::cout<<ell_proj.get_angle()<<std::endl;
+         std::cout<<"ell_from_box info"<<std::endl;
+         std::cout<<ell_compute_from_box.get_axes()<<std::endl;
+         std::cout<<ell_compute_from_box.get_center()<<std::endl;
+         std::cout<<ell_compute_from_box.get_angle()<<std::endl;
+         std::cout<<"conf"<<std::endl;
+         std::cout<<confs_[1]<<std::endl;
+         std::cout<<"error"<<std::endl;
+         std::cout<<gaussian_wasserstein_2d(ell_compute_from_box, ell_proj)<<std::endl;
+         std::cout<<"^^^^^^^"<<std::endl;
+        */
+ 
          optimizer.initializeOptimization();
          optimizer.optimize(8);
          Eigen::Matrix<double, 6, 1> ellipsoid_estimate = v->estimate();
          
          Ellipsoid new_ellipsoid(ellipsoid_estimate.head(3), Eigen::Matrix3d::Identity(), ellipsoid_estimate.tail(3));
+         /*
          std::cout<<"###DEBUG###"<<std::endl;
          std::cout<<ell.get_axes()-new_ellipsoid.get_axes()<<std::endl;
          std::cout<<"###DEBUG###"<<std::endl;
+         */
          this->set_ellipsoid(new_ellipsoid);
    
 
