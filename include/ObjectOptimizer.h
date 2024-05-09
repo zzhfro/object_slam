@@ -49,7 +49,7 @@ class EdgeEllipsoidProjection: public g2o::BaseUnaryEdge<1, double, VertexEllips
 
   public:
      EdgeEllipsoidProjection(const Eigen::Matrix<double, 3, 4>& P_, const Ellipse& det_ell_, const Eigen::Matrix3d& ellipsoid_R_)
-        : P(P), det_ell(det_ell_), ellipsoid_R(ellipsoid_R_) {}
+        : P(P_), det_ell(det_ell_), ellipsoid_R(ellipsoid_R_) {}
 
      virtual void computeError() override
     {
@@ -60,6 +60,13 @@ class EdgeEllipsoidProjection: public g2o::BaseUnaryEdge<1, double, VertexEllips
         Ellipse proj = ellipsoid.project(P);
 
         _error[0] = gaussian_wasserstein_2d(det_ell, proj);
+        
+        /*
+        std::cout<<"dEBUG IN G20"<<std::endl;
+        std::cout<<P<<std::endl;
+        std::cout<<det_ell.get_axes()<<std::endl;
+        std::cout<<"dEBUG IN G20"<<std::endl;
+        */
     }
 
     virtual bool read(std::istream&) override {return true;}
