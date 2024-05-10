@@ -47,6 +47,12 @@ void Map::AddMapObject(Object *obj)
     unique_lock<mutex> lock(mMutexMap);
     objects_map.push_back(obj);
 }
+void Map::EraseMapObject(Object *obj)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    auto it = std::find(objects_map.begin(), objects_map.end(), obj);
+    objects_map.erase(it);
+}
 void Map::EraseMapPoint(MapPoint *pMP)
 {
     unique_lock<mutex> lock(mMutexMap);

@@ -49,8 +49,12 @@ namespace ORB_SLAM2
 
      if(kf)
      {
+      new_obj->keyframe_confs.clear();
       new_obj->keyframe_confs[kf]=box.ObjectConf;
+      new_obj->box_observed_kf.clear();
       new_obj->box_observed_kf[kf]=box;
+      new_obj->Rts_kf.clear();
+      new_obj->Rts_kf[kf]=Rt;
      }
 
      new_obj->tracker = track;
@@ -71,6 +75,7 @@ namespace ORB_SLAM2
     {
        keyframe_confs[kf]=box.ObjectConf;
        box_observed_kf[kf]=box;
+       Rts_kf[kf]=Rt;
        std::unique_lock<std::mutex> lock(mutex_associated_map_points);
        for(int i=0;i<kf->mvKeys.size();++i)
        {
@@ -120,7 +125,7 @@ namespace ORB_SLAM2
 
   }
   
-  bool Object::restruct_from_center()
+  bool Object::reconstruct_from_center()
   {
      if(this->get_angled_difference()<TO_RAD(10.0))
      {
@@ -142,6 +147,60 @@ namespace ORB_SLAM2
 
   }
 
+  bool  Object::reconstruct_from_center_kf()
+  {
+   if(this->get_angled_difference()<TO_RAD(10.0))
+     {
+        //only above 10 thne begin restruct
+        return false;
+     }
+     Eigen::Matrix3d K;
+     cv::cv2eigen(tracker->GetK(), K);
+     
+     std::unordered_map<KeyFrame*,Eigen::Matrix<double,3,4>> Rts_kf_map=this->get_Rts_kf();
+     std::unordered_map<KeyFrame*,BoundingBox> box_kf_map=this->get_box_observed_kf();
+     
+     std::vector<BoundingBox>box_kf;
+     std::vector<Eigen::Matrix<double,3,4>> Rts_kf;
+
+     for (auto& it : box_kf_map) {
+         
+            box_kf.push_back(it.second);
+            Rts_kf.push_back(Rts_kf_map[it.first]);
+        }
+     auto [status_reconstruct, ellipsoid_tmp] = Ellipsoid::reconstruct_ellipsoid_from_center(box_kf, Rts_kf, K);
+     if(!status_reconstruct)
+     {
+        return false;
+
+     }
+    this->set_ellipsoid(ellipsoid_tmp);
+     if (status == ObjectTrackStatus::ONLY_2D)
+        status = ObjectTrackStatus::INITIALIZED;
+     return true; 
+  }
+ bool Object::check_reprojection_iou(double threshold)
+  { 
+    Eigen::Matrix3d K;
+    cv::cv2eigen(tracker->GetK(), K);
+    double iou=0;
+    double error_count=0;
+    for(int di=0;di<box_observed.size();++di)
+    {
+      Eigen::Matrix<double, 3, 4> P = K * Rts[di];
+      BoundingBox box=box_observed[di];
+      Ellipse ell_project=this->get_ellipsoid().project(P);
+      BoundingBox box_project=ell_project.compute_box();
+      iou=BoundingBox::calculate_iou(box,box_project);
+      if(iou<threshold)
+      {
+         return false;
+      }
+    }
+    
+
+    return true;
+  }
   void Object::optimize_reconstruction()
   {  
      {
@@ -171,7 +230,7 @@ namespace ORB_SLAM2
     );
     g2o::SparseOptimizer optimizer;
     optimizer.setAlgorithm(solver);
-    optimizer.setVerbose(true);
+    optimizer.setVerbose(false);
 
      VertexEllipsoidNoRotate*  v=new VertexEllipsoidNoRotate();
      Eigen::Matrix<double, 6, 1> e;
@@ -216,7 +275,7 @@ namespace ORB_SLAM2
          edge->setInformation(information_matrix);
          optimizer.addEdge(edge);
      }   
-         /**
+         /*
          std::cout<<"^^^^^PROJECTTION DEBUG^^^^"<<std::endl;
          Eigen::Matrix<double, 3, 4> P = K * Rts_[1]; 
          Ellipse ell_proj=ell.project(P );
@@ -244,8 +303,8 @@ namespace ORB_SLAM2
          std::cout<<boxes_.size()<<std::endl;
          std::cout<<error<<std::endl;
          std::cout<<"^^^^^^^"<<std::endl;
-        
         */
+        
          optimizer.initializeOptimization();
          optimizer.optimize(10);
          Eigen::Matrix<double, 6, 1> ellipsoid_estimate = v->estimate();
@@ -260,6 +319,96 @@ namespace ORB_SLAM2
    
 
   }
+  std::unordered_map<MapPoint*, int> Object::get_associate_mappoints_filter(int threshold)
+  {
+   std::unique_lock<std::mutex> lock(mutex_associated_map_points);
+   std::unordered_map<MapPoint*, int> filtered;
+        for (auto mp_cnt : associated_map_points) {
+            if (mp_cnt.second > threshold) {
+                filtered[mp_cnt.first] = mp_cnt.second;
+            }
+        }
+   //obs >threshold
+        if (this->get_status()==ObjectTrackStatus::IN_MAP) 
+        {
+            const auto& ellipsoid = this->get_ellipsoid();
+            for (auto mp_cnt : associated_map_points) 
+            {
+                cv::Mat p = mp_cnt.first->GetWorldPos();
+                Eigen::Vector3d pos(p.at<float>(0), p.at<float>(1), p.at<float>(2));
+                if (ellipsoid.is_inside(pos))
+                    filtered[mp_cnt.first] = mp_cnt.second;
+            }
+        }
+
+        return filtered;
+  }
+   bool Object::merge(Object * be_merged_obj)
+   {
+     std::unique_lock<std::mutex> lock(mutex_add_detection);
+     std::unordered_map<KeyFrame*, double> be_merged_confs=be_merged_obj->get_keyframe_confs();
+     std::unordered_map<KeyFrame*, BoundingBox> be_merged_box=be_merged_obj->get_box_observed_kf();
+     std::unordered_map<KeyFrame*, Eigen::Matrix<double,3,4>> be_merged_Rts=be_merged_obj->get_Rts_kf();
+
+     for (auto kf : be_merged_box) {
+        box_observed_kf[kf.first] = kf.second;
+        Rts_kf[kf.first]=be_merged_Rts[kf.first];
+        keyframe_confs[kf.first] = be_merged_confs[kf.first];
+    }
+    bool status=this->reconstruct_from_center_kf();
+    return status;
+    
+   }
+
+
+      double Object::check_reprojection_ioU_kf(double iou_threshold)
+      {
+         std::unordered_map<KeyFrame*, BoundingBox> boxes_=this->get_box_observed_kf();
+         std::unordered_map<KeyFrame*, double>confs_=this->get_keyframe_confs();
+         std::unordered_map<KeyFrame*,Eigen::Matrix<double,3,4>> Rts_=this->get_Rts_kf();
+
+         Ellipsoid ell=this->get_ellipsoid();
+         Eigen::Matrix3d K;
+         cv::cv2eigen(tracker->GetK(), K);
+         double iou=0;
+         double error_count=0;
+         for(auto it = boxes_.begin(); it != boxes_.end(); ++it)
+         {
+            BoundingBox box=boxes_[it->first];
+            Eigen::Matrix<double, 3, 4> P = K * Rts_[it->first];
+            Ellipse ell_project=this->get_ellipsoid().project(P);
+            BoundingBox box_project=ell_project.compute_box();
+            iou=BoundingBox::calculate_iou(box,box_project);
+            if(iou>iou_threshold);
+            {
+               error_count++;
+            }
+
+         }
+
+         return error_count/boxes_.size();
+
+
+     }
+     bool Object::remove_obj(Object * be_merged_obj)
+     {
+      std::unordered_map<KeyFrame*, BoundingBox> boxes_=be_merged_obj->get_box_observed_kf();
+      std::unique_lock<std::mutex> lock(mutex_add_detection);
+      for (auto kf : boxes_) {
+        if (box_observed_kf.find(kf.first) != box_observed_kf.end())
+        {
+            box_observed_kf.erase(kf.first);
+            keyframe_confs.erase(kf.first);
+            Rts_kf.erase(kf.first);
+        }
+      }
+
+
+     }
+    
+
+    
+  
 
 
 

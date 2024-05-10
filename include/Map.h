@@ -40,7 +40,7 @@ class Map
 {
 public:
     Map();
-
+    void EraseMapObject(Object *obj);
     void AddKeyFrame(KeyFrame* pKF);
     void AddMapPoint(MapPoint* pMP);
     void EraseMapPoint(MapPoint* pMP);

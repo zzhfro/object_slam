@@ -37,6 +37,15 @@ int count_set_map_intersection(const std::unordered_set<T>& s0, const std::unord
         res += s1.count(x);
     }
     return res;
-}  
+}
+
+template <class T, class V>
+size_t count_map_intersection(const std::unordered_map<T, V>& s0, const std::unordered_map<T, V>& s1) {
+    size_t res = 0;
+    for (const auto& x : s0) {
+        res += s1.count(x.first);
+    }
+    return res;
+}
 }
 #endif

@@ -96,7 +96,7 @@ void MapDrawer::DrawMapObjects() {
                      static_cast<double>(color[1]) / 255,
                      static_cast<double>(color[0]) / 255);
 
-           Ellipsoid& ell = object->ellipsoid;
+            Ellipsoid  ell = object->get_ellipsoid();
 
             if (!display_3d_bbox_) 
             {

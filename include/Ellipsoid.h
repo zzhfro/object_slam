@@ -4,8 +4,11 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include "Ellipse.h"
+#include "BoundingBox3d.h"
 namespace ORB_SLAM2
 {
+  class BoundingBox3d;
+
   class  Ellipsoid
   {
    EIGEN_MAKE_ALIGNED_OPERATOR_NEW; 
@@ -38,7 +41,7 @@ namespace ORB_SLAM2
     {
       return axes;
     }
-
+   bool is_inside(const Eigen::Vector3d& pt) const;
     Eigen::Matrix3d get_R()
     {
       return R;
@@ -50,7 +53,10 @@ namespace ORB_SLAM2
    }
 
    Eigen::Matrix<double, Eigen::Dynamic, 3> generate_ellipsoid_points(int azimuths, int elevations, int sampling);
+   
    Eigen::Matrix<double, Eigen::Dynamic, 3> generate_point_cloud(int sampling);
+   
+   BoundingBox3d compute3d_box(); 
    
    Ellipse project(const Eigen::Matrix<double, 3, 4>& P)
    {

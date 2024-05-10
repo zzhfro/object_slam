@@ -1,6 +1,7 @@
 #include "Ellipsoid.h"
 #include <iostream>
 #include <Eigen/Dense>
+#include "BoundingBox3d.h"
 
 #define TO_RAD(x) 0.01745329251 * (x)
 #define TO_DEG(x) 57.2957795131 * (x)
@@ -213,5 +214,23 @@ std::pair<bool, Ellipsoid>
     mean_3d_size /= sizes.size();
     return {true, Ellipsoid(Eigen::Vector3d::Ones() * mean_3d_size * 0.5, Eigen::Matrix3d::Identity(), center)};
    }
+
+
+BoundingBox3d Ellipsoid::compute3d_box() 
+{
+    
+    Eigen::Matrix3d M = R * Eigen::DiagonalMatrix<double, 3>(axes);
+    double dx = M.row(0).norm();
+    double dy = M.row(1).norm();
+    double dz = M.row(2).norm();
+
+    BoundingBox3d box_3d(center[0] , center[1], center[2],dx*2,dy*2,dz*2,0);
+    return box_3d;
+}   
+bool Ellipsoid::is_inside(const Eigen::Vector3d& pt) const {
+  
+    Eigen::Vector3d pt_e = R.transpose() * (pt - center);
+    return std::pow(pt_e[0] / axes[0], 2) + std::pow(pt_e[1] / axes[1], 2) + std::pow(pt_e[2] / axes[2], 2) <= 1.0;
+}
 
 };

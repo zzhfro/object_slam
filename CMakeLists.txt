@@ -61,6 +61,9 @@ src/ObjectDetect.cc
 src/Ellipse.cc
 src/Ellipsoid.cc
 src/Object.cc
+src/LocalObjectMapping.cc
+src/Distance.cc
+src/BoundingBox3d.cc
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -75,9 +78,14 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/RGB-D)
 
+
 add_executable(semantic_slam
 Examples/RGB-D/semantic_slam.cc)
 target_link_libraries(semantic_slam ${PROJECT_NAME})
+
+add_executable(test_erase
+Examples/RGB-D/test_erase.cc)
+target_link_libraries(test_erase ${PROJECT_NAME})
 
 add_executable(test_color_manager
 Examples/RGB-D/test_color_manager.cc)

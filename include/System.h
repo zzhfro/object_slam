@@ -36,7 +36,7 @@
 #include "ORBVocabulary.h"
 #include "Viewer.h"
 #include "ObjectDetect.h"
-
+#include "LocalObjectMapping.h"
 namespace ORB_SLAM2
 {
 
@@ -48,6 +48,7 @@ class Tracking;
 class LocalMapping;
 class LoopClosing;
 class DetectResult;
+class LocalObjectMapping;
 
 class System
 {
@@ -150,7 +151,8 @@ private:
     // Loop Closer. It searches loops with every new keyframe. If there is a loop it performs
     // a pose graph optimization and full bundle adjustment (in a new thread) afterwards.
     LoopClosing* mpLoopCloser;
-
+     
+    LocalObjectMapping* mpLocalObjectMapper; 
     // The viewer draws the map and the current camera pose. It uses Pangolin.
     Viewer* mpViewer;
 
@@ -162,6 +164,7 @@ private:
     std::thread* mptLocalMapping;
     std::thread* mptLoopClosing;
     std::thread* mptViewer;
+    std::thread* mptLocalObjectMapping;
 
     // Reset flag
     std::mutex mMutexReset;

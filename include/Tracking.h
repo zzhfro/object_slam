@@ -40,6 +40,7 @@
 #include "ObjectDetect.h"
 #include <mutex>
 #include "Object.h"
+#include "LocalObjectMapping.h"
 
 namespace ORB_SLAM2
 {
@@ -66,6 +67,7 @@ public:
     cv::Mat GrabImageMonocular(const cv::Mat &im, const double &timestamp);
 
     void SetLocalMapper(LocalMapping* pLocalMapper);
+    void SetLocalObjectMapper(LocalObjectMapping *pLocalObjectMapper);
     void SetLoopClosing(LoopClosing* pLoopClosing);
     void SetViewer(Viewer* pViewer);
     cv::Mat GetK() const {
@@ -127,6 +129,18 @@ protected:
     // Main tracking function. It is independent of the input sensor.
     void Track();
 
+    void RemoveTrack(Object* obj)
+    {
+        if (obj->status==ObjectTrackStatus::INITIALIZED)
+            mpMap->EraseMapObject(obj);
+
+        auto it = std::find(objects_track.begin(), objects_track.end(), obj);
+
+        if (it != objects_track.end()) {
+            objects_track.erase(it);
+        }
+    }
+
     // Map initialization for stereo and RGB-D
     void StereoInitialization();
 
@@ -160,6 +174,7 @@ protected:
     //Other Thread Pointers
     LocalMapping* mpLocalMapper;
     LoopClosing* mpLoopClosing;
+    LocalObjectMapping* mpLocalObjectMapper;
 
     //ORB
     ORBextractor* mpORBextractorLeft, *mpORBextractorRight;

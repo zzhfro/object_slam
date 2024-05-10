@@ -157,7 +157,10 @@ void Tracking::SetLocalMapper(LocalMapping *pLocalMapper)
 {
     mpLocalMapper=pLocalMapper;
 }
-
+void Tracking::SetLocalObjectMapper(LocalObjectMapping *pLocalObjectMapper)
+{
+    mpLocalObjectMapper=pLocalObjectMapper;
+}
 void Tracking::SetLoopClosing(LoopClosing *pLoopClosing)
 {
     mpLoopClosing=pLoopClosing;
@@ -485,12 +488,27 @@ if (mState == Tracking::OK)
                 if ((tr->get_obs_num() > 10 && tr->get_status() == ObjectTrackStatus::ONLY_2D) 
                     ||(tr->get_obs_num() % 2 == 0 && tr->get_status() == ObjectTrackStatus::INITIALIZED)) 
                     {   
-                        bool status_rec=tr->restruct_from_center();
+                        bool status_rec=tr->reconstruct_from_center();
                         if(status_rec)
                         {
                           tr->optimize_reconstruction();
                         }
                     }
+              }
+              if(tr->get_obs_num()>40&&tr->get_status()==ObjectTrackStatus::IN_MAP)
+                                                               
+              {
+                //std::cout<<"success1"<<std::endl;
+                bool status_check=tr->check_reprojection_iou(0.3);
+                if(status_check)
+                {
+                    //std::cout<<"success2"<<std::endl;
+                  mpLocalObjectMapper->InsertModifiedObject(tr);
+                }  
+                else
+                {
+                    tr->set_bad();
+                }
               }
             }
         }
@@ -500,6 +518,10 @@ if (mState == Tracking::OK)
             if(tr->status==ObjectTrackStatus::INITIALIZED)
             {
                 tr->insert_Map(mpMap);
+            }
+            if(tr->if_bad())
+            {
+               RemoveTrack(tr);
             }
            
         }
