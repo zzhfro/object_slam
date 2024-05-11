@@ -471,6 +471,10 @@ if (mState == Tracking::OK)
             {
               Object* associated_track=possible_tracks[assigned_track_idx];
               associated_track->add_detection(det,Rt,current_frame_id,kf);
+              if(kf&&associated_track->get_status()==ObjectTrackStatus::IN_MAP)
+              {
+                mpLocalObjectMapper->InsertModifiedObject(associated_track);
+              }
 
             }
 
@@ -495,13 +499,14 @@ if (mState == Tracking::OK)
                         }
                     }
               }
-              if(tr->get_obs_num()>40&&tr->get_status()==ObjectTrackStatus::IN_MAP)
+              if(tr->get_obs_num()>40&&tr->get_status()==ObjectTrackStatus::INITIALIZED)
                                                                
               {
                 //std::cout<<"success1"<<std::endl;
-                bool status_check=tr->check_reprojection_iou(0.3);
-                if(status_check)
+                double count_check=tr->check_reprojection_iou(0.3);
+                if(count_check>0.6)
                 {
+                    tr->insert_Map(mpMap);
                     //std::cout<<"success2"<<std::endl;
                   mpLocalObjectMapper->InsertModifiedObject(tr);
                 }  
@@ -514,14 +519,15 @@ if (mState == Tracking::OK)
         }
         
         for (auto& tr : objects_track)
-        {
-            if(tr->status==ObjectTrackStatus::INITIALIZED)
-            {
-                tr->insert_Map(mpMap);
-            }
+        { 
+            //if (tr->get_last_obsframe_id() <current_frame_id - 30
+            //&& tr->get_status() != ObjectTrackStatus::IN_MAP) 
+            //{
+               // tr->set_bad();
+            //}
             if(tr->if_bad())
             {
-               RemoveTrack(tr);
+              RemoveTrack(tr);
             }
            
         }

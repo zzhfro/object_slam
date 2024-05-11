@@ -127,9 +127,9 @@ namespace ORB_SLAM2
   
   bool Object::reconstruct_from_center()
   {
-     if(this->get_angled_difference()<TO_RAD(10.0))
+     if(std::abs(this->get_angled_difference())<TO_RAD(10.0))
      {
-        //only above 10 thne begin restruct
+        
         return false;
      }
      Eigen::Matrix3d K;
@@ -179,12 +179,12 @@ namespace ORB_SLAM2
         status = ObjectTrackStatus::INITIALIZED;
      return true; 
   }
- bool Object::check_reprojection_iou(double threshold)
+ double Object::check_reprojection_iou(double threshold)
   { 
     Eigen::Matrix3d K;
     cv::cv2eigen(tracker->GetK(), K);
     double iou=0;
-    double error_count=0;
+    double valid_count=0;
     for(int di=0;di<box_observed.size();++di)
     {
       Eigen::Matrix<double, 3, 4> P = K * Rts[di];
@@ -192,14 +192,14 @@ namespace ORB_SLAM2
       Ellipse ell_project=this->get_ellipsoid().project(P);
       BoundingBox box_project=ell_project.compute_box();
       iou=BoundingBox::calculate_iou(box,box_project);
-      if(iou<threshold)
+      if(iou>threshold)
       {
-         return false;
+         valid_count++;
       }
     }
     
 
-    return true;
+    return valid_count/box_observed.size();
   }
   void Object::optimize_reconstruction()
   {  
@@ -355,7 +355,7 @@ namespace ORB_SLAM2
         Rts_kf[kf.first]=be_merged_Rts[kf.first];
         keyframe_confs[kf.first] = be_merged_confs[kf.first];
     }
-    bool status=this->reconstruct_from_center_kf();
+    bool status=this->reconstruct_from_center();
     return status;
     
    }
@@ -364,7 +364,6 @@ namespace ORB_SLAM2
       double Object::check_reprojection_ioU_kf(double iou_threshold)
       {
          std::unordered_map<KeyFrame*, BoundingBox> boxes_=this->get_box_observed_kf();
-         std::unordered_map<KeyFrame*, double>confs_=this->get_keyframe_confs();
          std::unordered_map<KeyFrame*,Eigen::Matrix<double,3,4>> Rts_=this->get_Rts_kf();
 
          Ellipsoid ell=this->get_ellipsoid();
@@ -386,7 +385,7 @@ namespace ORB_SLAM2
 
          }
 
-         return error_count/boxes_.size();
+         return error_count/(boxes_.size()+1);
 
 
      }

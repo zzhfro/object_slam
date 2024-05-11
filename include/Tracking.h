@@ -131,7 +131,7 @@ protected:
 
     void RemoveTrack(Object* obj)
     {
-        if (obj->status==ObjectTrackStatus::INITIALIZED)
+        if (obj->status==ObjectTrackStatus::IN_MAP)
             mpMap->EraseMapObject(obj);
 
         auto it = std::find(objects_track.begin(), objects_track.end(), obj);

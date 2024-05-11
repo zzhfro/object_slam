@@ -125,7 +125,7 @@ public:
 
    bool reconstruct_from_center_kf();
    
-   bool check_reprojection_iou(double threshold);
+   double check_reprojection_iou(double threshold);
 
    bool merge(Object * be_merged_obj);
    bool remove_obj(Object * be_merged_obj);

@@ -6,6 +6,7 @@
 #include "Tracking.h"
 #include "KeyFrameDatabase.h"
 #include "Object.h"
+#include "Utils.h"
 #include <unordered_set>
 #include <mutex>
 

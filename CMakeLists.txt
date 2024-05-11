@@ -64,6 +64,7 @@ src/Object.cc
 src/LocalObjectMapping.cc
 src/Distance.cc
 src/BoundingBox3d.cc
+src/Utils.cc
 )
 
 target_link_libraries(${PROJECT_NAME}

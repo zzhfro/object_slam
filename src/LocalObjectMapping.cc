@@ -89,15 +89,23 @@ void LocalObjectMapping::Run()
                 double rel_inter2 = inter / bb2.volume();
 
                 auto pts_2 = obj2->get_associate_mappoints_filter(10);
-                int nb_common_points = count_map_intersection(pts, pts_2);
+                auto nb_common_points = count_map_intersection(pts, pts_2);
 
                
-                if (ell.is_inside(ell2.get_center()) || ell2.is_inside(center) || iou > 0.15 || rel_inter > 0.2 || rel_inter2 > 0.2 || nb_common_points >= 10) { //0.4
-   
+                if (ell.is_inside(ell2.get_center()) || ell2.is_inside(center) || iou > 0.15 || rel_inter > 0.2 || rel_inter2 > 0.2 || nb_common_points >= 10) 
+                { 
+                    std::cout<<"success1"<<std::endl;
+            
                     auto ellipsoid_save = obj2->get_ellipsoid();
                     auto merge_ok = obj2->merge(obj);
-                    if (merge_ok && obj2->check_reprojection_ioU_kf(0.2) > 0.5) 
-                    {
+                    std::cout<<"Merge test"<<std::endl;
+                    std::cout<<merge_ok<<std::endl;
+                    std::cout<<obj2->check_reprojection_ioU_kf(0.2)<<std::endl;
+                    //if (merge_ok && obj2->check_reprojection_ioU_kf(0.2) > 0.5) 
+                    if(1)
+                    {   
+                        
+                        std::cout<<"success2"<<std::endl;
                         obj->set_bad(); // object will be removed from the map
                         break;
                     } else {

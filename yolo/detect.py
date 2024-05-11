@@ -36,7 +36,7 @@ def process_images_in_folder(folder_path,output_file):
 
 # Load a pretrained YOLOv8n model
 #model = YOLO('yolov8n-seg.pt')
-output_file = "output_static.txt"
+output_file = "output_desk.txt"
 if os.path.exists(output_file):
     # 如果存在，则删除文件
     os.remove(output_file)                
@@ -45,7 +45,7 @@ if os.path.exists(output_file):
 model = YOLO('yolov8n.pt')
 
 # Define path to the image file
-source = '/home/zzhfro/data/rgbd_dataset_freiburg2_desk_with_person/rgb'
+source = '/home/zzhfro/data/rgbd_dataset_freiburg2_desk/rgb'
 # 结果文件路径
 
 

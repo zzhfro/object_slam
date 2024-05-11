@@ -1,0 +1,1 @@
+./semantic_slam /home/zzhfro/code/object_slam/ORB_SLAM2/Vocabulary/ORBvoc.txt TUM2.yaml /home/zzhfro/data/rgbd_dataset_freiburg2_desk /home/zzhfro/data/rgbd_dataset_freiburg2_desk/associate.txt /home/zzhfro/code/object_slam/ORB_SLAM2/yolo/output_desk.txt
