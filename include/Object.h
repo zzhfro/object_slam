@@ -33,7 +33,7 @@ class Object
 public:
    Object():category_id(-1),object_id(-1),ellipsoid()
    {
-    
+    int max_capacity = 150;
    }
    
    static Object* creat_new_object(int category,BoundingBox &box,Eigen::Matrix<double,3,4> &Rt,int frame_id,Tracking* track,KeyFrame* kf);
@@ -72,6 +72,24 @@ public:
    {
     std::unique_lock<std::mutex> lock(mutex_add_detection);
     return Rts_kf;
+   }
+
+   std::vector<double> get_confs()
+   {
+    std::unique_lock<std::mutex> lock(mutex_add_detection);
+    return confs;
+   }
+
+   std::vector<BoundingBox> get_boxes()
+   {
+    std::unique_lock<std::mutex> lock(mutex_add_detection);
+    return box_observed;
+   }
+
+   std::vector<Eigen::Matrix<double,3,4>> get_Rts()
+   {
+    std::unique_lock<std::mutex> lock(mutex_add_detection);
+    return Rts;
    }
 
    void set_bad()
@@ -125,8 +143,8 @@ public:
 
    bool reconstruct_from_center_kf();
    
-   double check_reprojection_iou(double threshold);
-
+   double check_reprojection_iou(double threshold,bool if_erase);
+   double check_reprojection_iou_single(BoundingBox& box,Eigen::Matrix<double,3,4>& Rt);
    bool merge(Object * be_merged_obj);
    bool remove_obj(Object * be_merged_obj);
 
@@ -147,6 +165,7 @@ public:
    std::vector<double> confs;
    std::vector<BoundingBox> box_observed; //store the box observe the object
    
+   int max_capacity = 150;  // 定义容量阈值
    std::mutex mutex_associated_map_points;
    std::unordered_map<MapPoint*, int> associated_map_points;
    

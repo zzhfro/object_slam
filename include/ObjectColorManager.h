@@ -31,9 +31,9 @@ ObjectColorManager(int category_num,const std::string& filename) {
     void initializeColorVector(int category_num) {
         // 这里使用简单的固定颜色生成算法，可以根据需要自定义
         for (int i = 0; i < category_num; ++i) {
-            int b = i * 10 % 256;
-            int g = i * 20 % 256;
-            int r = i * 30 % 256;
+            int b = i * 10 % (256+i*1);
+            int g = i * 30 % (256+i*3);
+            int r = i * 20 % (256+i*2);
             cv::Scalar color(b, g, r);
             color_vector.push_back(color);
         }

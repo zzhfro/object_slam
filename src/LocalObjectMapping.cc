@@ -17,6 +17,7 @@
 #include "BoundingBox3d.h"
 #include "Utils.h"
 #include "KeyFrame.h"
+#include "Thirdparty/g2o/g2o/core/robust_kernel_impl.h"
 namespace ORB_SLAM2{
 
 LocalObjectMapping::LocalObjectMapping(Map *pMap):
@@ -62,8 +63,13 @@ void LocalObjectMapping::Run()
 
             // obj->GetTrack()->TryResetEllipsoidFromMaPoints();
             // obj->GetTrack()->AssociatePointsInsideEllipsoid(mpMap);
+            
 
             optimize_reconstruction(obj);
+            obj->check_reprojection_iou(0.3,1);
+
+
+
              
              //the fusion process
 
@@ -94,15 +100,15 @@ void LocalObjectMapping::Run()
                
                 if (ell.is_inside(ell2.get_center()) || ell2.is_inside(center) || iou > 0.15 || rel_inter > 0.2 || rel_inter2 > 0.2 || nb_common_points >= 10) 
                 { 
-                    std::cout<<"success1"<<std::endl;
+                    //std::cout<<"success1"<<std::endl;
             
                     auto ellipsoid_save = obj2->get_ellipsoid();
-                    auto merge_ok = obj2->merge(obj);
-                    std::cout<<"Merge test"<<std::endl;
-                    std::cout<<merge_ok<<std::endl;
-                    std::cout<<obj2->check_reprojection_ioU_kf(0.2)<<std::endl;
-                    //if (merge_ok && obj2->check_reprojection_ioU_kf(0.2) > 0.5) 
-                    if(1)
+                    //std::cout<<"Merge test"<<std::endl;
+                    //auto merge_ok = obj2->merge(obj);
+                    //std::cout<<"Merge test"<<std::endl;
+        
+                   // if (merge_ok && obj2->check_reprojection_ioU_kf(0.2) > 0.5) 
+                   if(1)
                     {   
                         
                         std::cout<<"success2"<<std::endl;
@@ -177,7 +183,7 @@ void LocalObjectMapping::optimize_reconstruction(Object* obj)
     );
     g2o::SparseOptimizer optimizer;
     optimizer.setAlgorithm(solver);
-    optimizer.setVerbose(true);
+    optimizer.setVerbose(false);
 
      VertexEllipsoidQuat*  v=new VertexEllipsoidQuat();
      EllipsoidQuat ellipsoid_quat = EllipsoidQuat::FromEllipsoid(ell);
@@ -186,6 +192,7 @@ void LocalObjectMapping::optimize_reconstruction(Object* obj)
      v->setId(0);
      optimizer.addVertex(v);
      
+     /*
     std::unordered_map<KeyFrame*, BoundingBox> boxes_;
     std::unordered_map<KeyFrame*, double>confs_;
     std::unordered_map<KeyFrame*,Eigen::Matrix<double,3,4>> Rts_;
@@ -194,8 +201,14 @@ void LocalObjectMapping::optimize_reconstruction(Object* obj)
     boxes_=obj->get_box_observed_kf();
     confs_=obj->get_keyframe_confs();
     Rts_=obj->get_Rts_kf();
-    
+    */
+    std::vector<double> confs_=obj->get_confs();
+    std::vector<BoundingBox> boxes_=obj->get_boxes();
+    std::vector<Eigen::Matrix<double, 3, 4>> Rts_=obj->get_Rts();
+     
+    /* use kf to optimize
     int i=0;
+    
     for (auto it = boxes_.begin(); it != boxes_.end(); ++it)
     {   
         KeyFrame* kf = it->first;
@@ -209,7 +222,25 @@ void LocalObjectMapping::optimize_reconstruction(Object* obj)
         information_matrix *=confs_[kf];
         edge->setInformation(information_matrix);
         optimizer.addEdge(edge);
-    }   
+    } 
+    */
+   
+     for (double di=0;di<boxes_.size();++di)
+    {   
+        Eigen::Matrix<double, 3, 4> P = K * Rts_[di];
+         BoundingBox box=boxes_[di];
+        EdgeEllipsoidProjectionQuat *edge = new EdgeEllipsoidProjectionQuat(P, Ellipse::compute_ellipse(box), ell.get_R());
+        edge->setId(di);
+        edge->setVertex(0, v);
+        Eigen::Matrix<double, 1, 1> information_matrix = Eigen::Matrix<double, 1, 1>::Identity();
+        information_matrix *=confs_[di];
+        edge->setInformation(information_matrix);
+        g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
+        edge->setRobustKernel(rk);
+        optimizer.addEdge(edge);
+    } 
+
+      
          
          optimizer.initializeOptimization();
          optimizer.optimize(40);

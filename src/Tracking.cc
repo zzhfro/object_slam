@@ -253,19 +253,6 @@ if (mState == Tracking::OK)
             kf = nullptr;
        }
        Eigen::Matrix<double,3,4> Rt = RtFromT(mCurrentFrame.mTcw);
-       double z_mean=0;
-       unsigned int z_nb = 0;
-            for(size_t i = 0; i < mCurrentFrame.mvpMapPoints.size(); i++) {
-                MapPoint* pMP = mCurrentFrame.mvpMapPoints[i];
-                if(pMP && !mCurrentFrame.mvbOutlier[i]) {
-                    cv::Mat mp =  pMP->GetWorldPos();
-                    Eigen::Vector4d p(mp.at<float>(0), mp.at<float>(1), mp.at<float>(2), 1.0);
-                    Eigen::Vector3d p_cam = Rt * p;
-                    z_mean += p_cam[2];
-                    z_nb++;
-                }
-            }
-        z_mean /= z_nb;
         
     
         BoundingBox img_box(imRGB.cols/2,imRGB.rows/2,imRGB.cols,imRGB.rows,-1,-1);
@@ -418,10 +405,7 @@ if (mState == Tracking::OK)
                     {
                         double iou_2d = 0;
                         double iou_3d = 0;
-                        /**
-                         * B is the last box proj is the project box
-                         * cost : max(IOU(D,B),IOU(D,proj)
-                        */
+                      
 
                        if(tr->frame_ids.back()+30>current_frame_id)
                        {
@@ -470,6 +454,7 @@ if (mState == Tracking::OK)
             else  //associate box and objects
             {
               Object* associated_track=possible_tracks[assigned_track_idx];
+              
               associated_track->add_detection(det,Rt,current_frame_id,kf);
               if(kf&&associated_track->get_status()==ObjectTrackStatus::IN_MAP)
               {
@@ -499,12 +484,12 @@ if (mState == Tracking::OK)
                         }
                     }
               }
-              if(tr->get_obs_num()>40&&tr->get_status()==ObjectTrackStatus::INITIALIZED)
+              if(tr->get_obs_num()>30&&tr->get_status()==ObjectTrackStatus::INITIALIZED)
                                                                
               {
                 //std::cout<<"success1"<<std::endl;
-                double count_check=tr->check_reprojection_iou(0.3);
-                if(count_check>0.6)
+                double count_check=tr->check_reprojection_iou(0.3,0);
+                if(count_check>0.9)
                 {
                     tr->insert_Map(mpMap);
                     //std::cout<<"success2"<<std::endl;
@@ -533,21 +518,7 @@ if (mState == Tracking::OK)
         }
 
         
-        
 
-              
-
-
-
-
-
-
-
-          
-
-
-          
-          
 
 
         

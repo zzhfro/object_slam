@@ -88,7 +88,7 @@ void MapDrawer::DrawMapObjects() {
 
     for (const auto& object : objects) { 
        
-        if(object->category_id!=0) 
+        //if(object->category_id!=0) 
         {  auto info = object_color_manager.getObjectInfo(object->category_id);
            cv::Scalar color = info.first;
            std::string name = info.second;
