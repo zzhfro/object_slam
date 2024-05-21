@@ -111,7 +111,7 @@ void LocalObjectMapping::Run()
                    if(1)
                     {   
                         
-                        std::cout<<"success2"<<std::endl;
+                        std::cout<<"erase Duplicate object"<<std::endl;
                         obj->set_bad(); // object will be removed from the map
                         break;
                     } else {

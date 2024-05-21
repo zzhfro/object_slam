@@ -29,11 +29,11 @@
 namespace ORB_SLAM2
 {
 
-FrameDrawer::FrameDrawer(Map* pMap):mpMap(pMap)
+FrameDrawer::FrameDrawer(Map* pMap,const std::string &color_path):mpMap(pMap)
 {
     mState=Tracking::SYSTEM_NOT_READY;
     mIm = cv::Mat(480,640,CV_8UC3, cv::Scalar(0,0,0));
-    object_color_manager=ObjectColorManager(80,"/home/zzhfro/code/object_slam/ORB_SLAM2/Examples/RGB-D/obj.txt");
+    object_color_manager=ObjectColorManager(80,color_path);
     
 }
 

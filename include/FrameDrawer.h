@@ -44,11 +44,11 @@ class DetectResult;
 class FrameDrawer
 {
 public:
-    FrameDrawer(Map* pMap);
+    FrameDrawer(Map* pMap,const std::string &color_path);
 
     // Update info from the last processed frame.
     void Update(Tracking *pTracker);
-
+     std::string color_path;
     // Draw last processed frame.
     cv::Mat DrawFrame();
     cv::Mat DrawDetect(cv::Mat &img);
@@ -69,6 +69,7 @@ protected:
     DetectResult* detect_drawer;
     int mState;
     ObjectColorManager object_color_manager;
+    
     Map* mpMap;
 
     std::mutex mMutex;

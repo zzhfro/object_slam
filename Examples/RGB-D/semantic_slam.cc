@@ -1,7 +1,6 @@
 
 /**
  * created by zzh 2024.4
- * currently it is an offline mode
 */
 
 
@@ -26,7 +25,7 @@ bool matchDetection( std::string image_name, std::string detection_name);
 
 int main(int argc, char **argv)
 {   
-    if(argc != 6)
+    if(argc != 7)
     {
         cerr << endl << "Usage: ./rgbd_tum path_to_vocabulary path_to_settings path_to_sequence path_to_association path to detection" << endl;
         return 1;
@@ -57,7 +56,7 @@ int main(int argc, char **argv)
     LoadDetection(string(argv[5]),DetectResults);
     
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::RGBD,true);
+    ORB_SLAM2::System SLAM(argv[1],argv[2],argv[6],ORB_SLAM2::System::RGBD,true);
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -194,14 +193,14 @@ void LoadDetection(const std::string& filename, std::vector<ORB_SLAM2::DetectRes
    std::vector<double> num3;
 
     while (std::getline(file, line)) {
-        // 提取图片名字
+        // get name
         //ORB_SLAM2::DetectResult detect; 
         num1.clear();
         num2.clear();
         num3.clear();
         string image_name = line;
         
-        // 读取下三行数字
+        //get data
         std::getline(file, line);
         std::istringstream iss1(line);
         double number;

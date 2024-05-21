@@ -29,7 +29,7 @@ namespace ORB_SLAM2
 {
 
 
-MapDrawer::MapDrawer(Map* pMap, const string &strSettingPath):mpMap(pMap)
+MapDrawer::MapDrawer(Map* pMap, const string &strSettingPath,const string &color_path):mpMap(pMap)
 {
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
 
@@ -39,7 +39,7 @@ MapDrawer::MapDrawer(Map* pMap, const string &strSettingPath):mpMap(pMap)
     mPointSize = fSettings["Viewer.PointSize"];
     mCameraSize = fSettings["Viewer.CameraSize"];
     mCameraLineWidth = fSettings["Viewer.CameraLineWidth"];
-    object_color_manager=ObjectColorManager(80,"/home/zzhfro/code/object_slam/ORB_SLAM2/Examples/RGB-D/obj.txt");
+    object_color_manager=ObjectColorManager(80,color_path);
 }
 
 void MapDrawer::DrawMapPoints()

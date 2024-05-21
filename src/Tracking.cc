@@ -484,7 +484,7 @@ if (mState == Tracking::OK)
                         }
                     }
               }
-              if(tr->get_obs_num()>30&&tr->get_status()==ObjectTrackStatus::INITIALIZED)
+              if(tr->get_category_id()!=0&&tr->get_obs_num()>30&&tr->get_status()==ObjectTrackStatus::INITIALIZED)
                                                                
               {
                 //std::cout<<"success1"<<std::endl;
@@ -500,16 +500,33 @@ if (mState == Tracking::OK)
                     tr->set_bad();
                 }
               }
+              else
+              {
+                if(tr->get_category_id()==0&&tr->get_obs_num()>30&&tr->get_status()==ObjectTrackStatus::INITIALIZED)
+                {
+                     double count_check=tr->check_reprojection_iou(0.3,1);
+                    if(count_check>0.9)
+                    {
+                        tr->insert_Map(mpMap);
+                        //std::cout<<"success2"<<std::endl;
+                    mpLocalObjectMapper->InsertModifiedObject(tr);
+                    }  
+                    else
+                    {
+                        tr->set_bad();
+                    }
+                }
+              }
             }
         }
         
         for (auto& tr : objects_track)
         { 
-            //if (tr->get_last_obsframe_id() <current_frame_id - 30
-            //&& tr->get_status() != ObjectTrackStatus::IN_MAP) 
-            //{
-               // tr->set_bad();
-            //}
+            if (tr->get_last_obsframe_id() <current_frame_id - 30
+            && tr->get_status() != ObjectTrackStatus::IN_MAP) 
+            {
+                tr->set_bad();
+            }
             if(tr->if_bad())
             {
               RemoveTrack(tr);

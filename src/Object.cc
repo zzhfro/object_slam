@@ -81,7 +81,7 @@ namespace ORB_SLAM2
             confs.erase(confs.begin());
             frame_ids.erase(frame_ids.begin());
             Rts.erase(Rts.begin());
-            std::cout << "Removed oldest element." << std::endl;
+            
         }
 
     if(kf)

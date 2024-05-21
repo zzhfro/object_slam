@@ -195,7 +195,7 @@ std::pair<bool, Ellipsoid>
     {
         Eigen::Vector3d X_cam = Rts[i] * center.homogeneous();
         if (X_cam.z() < 0) {
-            std::cerr << "Reconstruction failed: z is negative" << std::endl;
+            //std::cerr << "Reconstruction failed: z is negative" << std::endl;
             return {false, Ellipsoid()};
         }
         Eigen::Vector3d X_img = K * X_cam;
@@ -204,7 +204,7 @@ std::pair<bool, Ellipsoid>
 
         if ((points2d[i] - Eigen::Vector2d(u, v)).norm() > 100) 
         {
-            std::cerr << "Reconstruction failed: reconstructed center is too far from a detection" << std::endl;
+            //std::cerr << "Reconstruction failed: reconstructed center is too far from a detection" << std::endl;
             return {false, Ellipsoid()};
         }
 

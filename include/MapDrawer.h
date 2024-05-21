@@ -35,10 +35,10 @@ namespace ORB_SLAM2
 class MapDrawer
 {
 public:
-    MapDrawer(Map* pMap, const string &strSettingPath);
+    MapDrawer(Map* pMap, const string &strSettingPath,const string &color_path);
 
     Map* mpMap;
-
+    
     void DrawMapPoints();
     void DrawMapObjects();
     void DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph);
@@ -56,7 +56,7 @@ private:
     float mPointSize;
     float mCameraSize;
     float mCameraLineWidth;
-
+    
     cv::Mat mCameraPose;
 
     std::mutex mMutexCamera;

@@ -30,7 +30,7 @@
 namespace ORB_SLAM2
 {
 
-System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
+System::System(const string &strVocFile, const string &strSettingsFile, const string &color_path,const eSensor sensor,
                const bool bUseViewer):mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false),mbActivateLocalizationMode(false),
         mbDeactivateLocalizationMode(false)
 {
@@ -79,9 +79,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpMap = new Map();
 
     //Create Drawers. These are used by the Viewer
-    mpFrameDrawer = new FrameDrawer(mpMap);
-    mpMapDrawer = new MapDrawer(mpMap, strSettingsFile);
-
+    mpFrameDrawer = new FrameDrawer(mpMap,color_path);
+    mpMapDrawer = new MapDrawer(mpMap, strSettingsFile,color_path);
     //Initialize the Tracking thread
     //(it will live in the main thread of execution, the one that called this constructor)
     mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
@@ -319,9 +318,11 @@ void System::Shutdown()
     {
         usleep(5000);
     }
-
+    
+    /*
     if(mpViewer)
         pangolin::BindToContext("ORB-SLAM2: Map Viewer");
+    */
 }
 
 void System::SaveTrajectoryTUM(const string &filename)
