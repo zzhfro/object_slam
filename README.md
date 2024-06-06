@@ -1,7 +1,7 @@
 # object-level semantic slam 
 ### The system is capable of localizing and constructing semantic maps of objects represented as ellipsoids in dynamic environments
 
-### this system is built upon [ORB-SLAM2](git@github.com:raulmur/ORB_SLAM2.git), and the semantic mapping component is a reimplementation of [oa-slam](https://gitlab.inria.fr/tangram/oa-slam), for this part i rewrite the code and add new algorithms to make it work in dynamic environments.
+### this system is built upon [ORB-SLAM2](git@github.com:raulmur/ORB_SLAM2.git), and the semantic mapping module is a reimplementation of [oa-slam](https://gitlab.inria.fr/tangram/oa-slam), i rewrite this part of code and add new algorithms to make it work in dynamic environments.
 
 ### thanks to the [ORB-SLAM2](git@github.com:raulmur/ORB_SLAM2.git) and [oa-slam](https://gitlab.inria.fr/tangram/oa-slam)
 
